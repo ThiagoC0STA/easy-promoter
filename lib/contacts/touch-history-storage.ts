@@ -6,6 +6,7 @@ export type TouchHistoryKind =
 export type TouchHistoryEntry = {
   at: string;
   kind: TouchHistoryKind;
+  note?: string;
 };
 
 const STORAGE_KEY = "ep_touch_history_v1";
@@ -43,12 +44,14 @@ function writeAll(data: Record<string, TouchHistoryEntry[]>) {
 export function appendTouchHistoryEntry(
   contactId: string,
   kind: TouchHistoryKind,
+  note?: string,
 ): void {
   const all = readAll();
   const prev = Array.isArray(all[contactId]) ? [...all[contactId]] : [];
   const entry: TouchHistoryEntry = {
     at: new Date().toISOString(),
     kind,
+    ...(note?.trim() ? { note: note.trim() } : {}),
   };
   const next = [entry, ...prev].slice(0, MAX_PER_CONTACT);
   all[contactId] = next;

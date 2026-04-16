@@ -5,10 +5,6 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { touchContactByIdAction } from "@/lib/contacts/actions";
 import { WhatsAppGlyph } from "@/components/icons/whatsapp-glyph";
-import {
-  getFollowUpDate,
-  setFollowUpDate,
-} from "@/lib/contacts/followup-storage";
 import { appendTouchHistoryEntry } from "@/lib/contacts/touch-history-storage";
 
 export type ContactChannel = "whatsapp" | "instagram";
@@ -18,6 +14,8 @@ type Props = {
   href: string;
   contactId: string;
   contactName: string;
+  /** Optional: custom trigger element. Receives the onClick handler. */
+  renderTrigger?: (onClick: () => void) => React.ReactNode;
 };
 
 const COPY: Record<
@@ -62,13 +60,14 @@ export function ChannelTouchLauncher({
   href,
   contactId,
   contactName,
+  renderTrigger,
 }: Props) {
   const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [touchError, setTouchError] = React.useState<string | null>(null);
-  const [followUpDate, setFollowUpDateState] = React.useState("");
+  const [note, setNote] = React.useState("");
   const t = COPY[channel];
   const titleId = `channel-touch-${channel}-${contactId}`;
 
@@ -95,7 +94,7 @@ export function ChannelTouchLauncher({
   React.useEffect(() => {
     if (!open) return;
     setTouchError(null);
-    setFollowUpDateState(getFollowUpDate(contactId) ?? "");
+    setNote("");
   }, [open, contactId]);
 
   function handleOpen() {
@@ -117,8 +116,7 @@ export function ChannelTouchLauncher({
         setTouchError(result.message);
         return;
       }
-      appendTouchHistoryEntry(contactId, "touch_confirmed");
-      setFollowUpDate(contactId, followUpDate.trim() || null);
+      appendTouchHistoryEntry(contactId, "touch_confirmed", note);
       setOpen(false);
       router.refresh();
     } finally {
@@ -140,7 +138,7 @@ export function ChannelTouchLauncher({
         {/* Solid overlay: no backdrop-blur (avoids GPU flicker inside glass-card ancestors) */}
         <button
           type="button"
-          className="absolute inset-0 bg-[color-mix(in_srgb,var(--color-text-primary)_72%,transparent)] cursor-default"
+          className="absolute inset-0 bg-[color-mix(in_srgb,#0f172a_55%,transparent)] dark:bg-[color-mix(in_srgb,#000_70%,transparent)] cursor-default"
           style={{ WebkitTapHighlightColor: "transparent" }}
           aria-label="Fechar"
           onClick={() => !busy && setOpen(false)}
@@ -174,14 +172,15 @@ export function ChannelTouchLauncher({
           ) : null}
           <label className="flex flex-col gap-1.5 mb-5">
             <span className="text-xs font-medium text-[var(--color-text-tertiary)]">
-              Próximo contato planejado (opcional, só neste aparelho)
+              Observação (opcional)
             </span>
-            <input
-              type="date"
-              value={followUpDate}
-              onChange={(e) => setFollowUpDateState(e.target.value)}
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               disabled={busy}
-              className="input-field min-h-11 max-w-xs"
+              rows={3}
+              placeholder="Ex: interessada na coleção nova, pediu para ligar quinta"
+              className="input-field resize-none text-sm"
             />
           </label>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
@@ -189,7 +188,7 @@ export function ChannelTouchLauncher({
               type="button"
               disabled={busy}
               onClick={() => setOpen(false)}
-              className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)]
+              className="h-11 px-4 rounded-xl text-sm font-medium border border-[var(--color-border)]
                          text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] hover:opacity-90
                          transition-opacity cursor-pointer disabled:opacity-50"
             >
@@ -199,7 +198,7 @@ export function ChannelTouchLauncher({
               type="button"
               disabled={busy}
               onClick={handleConfirmTouch}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white
+              className="h-11 px-4 rounded-xl text-sm font-semibold text-white
                          bg-emerald-600 hover:bg-emerald-500 transition-colors cursor-pointer disabled:opacity-60"
             >
               {busy ? "Salvando…" : "Sim, contato feito hoje"}
@@ -211,19 +210,23 @@ export function ChannelTouchLauncher({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleOpen}
-        title={t.ariaOpen}
-        aria-label={`${t.ariaOpen} de ${contactName}`}
-        className={btnClass}
-      >
-        {channel === "whatsapp" ? (
-          <WhatsAppGlyph size={18} />
-        ) : (
-          <InstagramGlyph />
-        )}
-      </button>
+      {renderTrigger ? (
+        renderTrigger(handleOpen)
+      ) : (
+        <button
+          type="button"
+          onClick={handleOpen}
+          title={t.ariaOpen}
+          aria-label={`${t.ariaOpen} de ${contactName}`}
+          className={btnClass}
+        >
+          {channel === "whatsapp" ? (
+            <WhatsAppGlyph size={18} />
+          ) : (
+            <InstagramGlyph />
+          )}
+        </button>
+      )}
       {mounted && modal ? createPortal(modal, document.body) : null}
     </>
   );

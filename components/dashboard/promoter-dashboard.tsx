@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Cake, LayoutDashboard, Users } from "lucide-react";
-import { PageHero } from "@/components/layout/page-hero";
+import { AlertTriangle, ArrowRight, Cake, Clock, Users } from "lucide-react";
+
 import type { Contact } from "@/lib/contacts/types";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { StatsCards } from "@/components/contacts/stats-cards";
 import { DayQueueFreshnessBanner } from "@/components/dashboard/day-queue-freshness-banner";
 import { DayQueueSection } from "@/components/dashboard/day-queue-section";
-import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
-import { buildSegmentInsightLines } from "@/lib/dashboard/segment-insights";
+import { MonthlyTouchesChart } from "@/components/dashboard/monthly-touches-chart";
 import {
   daysSinceContact,
   isBirthdaySoon,
@@ -36,7 +35,7 @@ export function PromoterDashboard({ contacts }: Props) {
       if (db === null) return 1;
       return db - da;
     })
-    .slice(0, 6);
+    .slice(0, 8);
 
   const birthdays = contacts
     .filter((c) => isBirthdaySoon(c.birthday))
@@ -45,158 +44,140 @@ export function PromoterDashboard({ contacts }: Props) {
       const db = daysUntilBirthday(b.birthday) ?? 999;
       return da - db;
     })
-    .slice(0, 6);
-
-  const segmentLines = buildSegmentInsightLines(contacts);
+    .slice(0, 8);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 sm:px-8 py-10 sm:py-14">
-      <PageHero
-        eyebrow="Visão geral"
-        title="Dashboard"
-        description={
-          <>
-            Gráficos da base, ritmo de contato e atalhos. A lista completa fica em
-            Contatos.
-          </>
-        }
-        icon={
-          <LayoutDashboard
-            size={24}
-            strokeWidth={1.5}
-            className="text-[var(--color-accent)]"
-          />
-        }
-        actions={
-          <Link href="/app/contacts" className="btn-primary">
-            <Users size={18} strokeWidth={1.75} />
-            Abrir contatos
-            <ArrowRight size={18} strokeWidth={1.75} />
-          </Link>
-        }
-      >
-        {priorityCount > 0 ? (
-          <p className="text-sm font-medium text-[var(--color-accent)]">
-            Há {priorityCount} contato{priorityCount === 1 ? "" : "s"} que{" "}
-            {priorityCount === 1 ? "precisa" : "precisam"} de retomada. Veja a prioridade
-            abaixo ou abra todos em Contatos.
+    <div className="mx-auto max-w-7xl px-5 sm:px-8 py-8 sm:py-10 flex flex-col gap-8">
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
+            Visão geral da base, ritmo de contato e atalhos.
           </p>
-        ) : contacts.length > 0 ? (
-          <p className="text-sm text-[var(--color-text-tertiary)]">
-            Ninguém fora do ritmo ideal neste recorte. Bom momento para planejar próximos
-            contatos.
-          </p>
-        ) : null}
-      </PageHero>
+          {priorityCount > 0 && (
+            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
+                            bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
+              <AlertTriangle size={12} strokeWidth={2} />
+              {priorityCount} ação{priorityCount !== 1 ? "ões" : ""} urgente{priorityCount !== 1 ? "s" : ""}
+            </div>
+          )}
+        </div>
+        <Link
+          href="/app/contacts"
+          className="inline-flex items-center gap-1.5 h-10 px-4 rounded-[var(--radius-control)] text-sm font-semibold
+                     bg-[var(--color-accent)] text-white hover:brightness-110 transition-all"
+        >
+          <Users size={15} strokeWidth={2} />
+          Contatos
+          <ArrowRight size={14} strokeWidth={2} />
+        </Link>
+      </div>
 
-      <div className="flex flex-col gap-10">
-        <DayQueueFreshnessBanner contacts={contacts} />
-        <StatsCards contacts={contacts} />
+      {/* ── Stats ──────────────────────────────────────────────────────── */}
+      <DayQueueFreshnessBanner contacts={contacts} />
+      <StatsCards contacts={contacts} />
 
-        {segmentLines.length > 0 ? (
-          <section aria-label="Resumo por segmento">
-            <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-3 pl-1 border-l-2 border-[var(--color-accent-muted)]">
-              Resumo por segmento
-            </h2>
-            <ul className="flex flex-col gap-1.5">
-              {segmentLines.map((line, i) => (
-                <li
-                  key={`segment-insight-${i}`}
-                  className="text-sm text-[var(--color-text-secondary)] leading-relaxed"
-                >
-                  {line}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+      {/* ── Gráfico mensal ─────────────────────────────────────────────── */}
+      <MonthlyTouchesChart contacts={contacts} />
 
-        <DayQueueSection contacts={contacts} />
+      {/* ── Fila do dia ────────────────────────────────────────────────── */}
+      <DayQueueSection contacts={contacts} />
 
+      {/* ── Priority + Birthdays ───────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Priority contacts */}
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-3 pl-1 border-l-2 border-[var(--color-accent-muted)]">
-            Gráficos
-          </h2>
-          <DashboardCharts contacts={contacts} />
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-red-500/15 flex items-center justify-center">
+                <Clock size={13} strokeWidth={1.75} className="text-red-400" />
+              </div>
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                Prioridade
+              </h2>
+            </div>
+            <Link
+              href="/app/contacts"
+              className="text-xs font-medium text-[var(--color-accent)] hover:underline"
+            >
+              Ver todos
+            </Link>
+          </div>
+          {priority.length === 0 ? (
+            <div className="glass-card rounded-[var(--radius-card)] p-8 text-center">
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                Tudo em dia. Bom momento para planejar próximos contatos.
+              </p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {priority.map((c) => {
+                const days = daysSinceContact(c.last_contacted_at);
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/app/contacts?edit=${c.id}`}
+                      className="glass-card rounded-[var(--radius-control)] px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-[var(--color-accent)]/40 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+                        {c.name}
+                      </span>
+                      <span className="text-xs text-red-400 shrink-0 font-medium">
+                        {days === null ? "Nunca" : `${days}d sem contato`}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section>
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] pl-1 border-l-2 border-[var(--color-accent-muted)]">
-                Prioridade (frio ou sem registro)
-              </h2>
-              <Link
-                href="/app/contacts"
-                className="text-xs font-medium text-[var(--color-accent)] hover:underline"
-              >
-                Ver todos
-              </Link>
+        {/* Birthdays */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-pink-500/15 flex items-center justify-center">
+              <Cake size={13} strokeWidth={1.75} className="text-pink-400" />
             </div>
-            {priority.length === 0 ? (
-              <div className="glass-card rounded-xl p-8 text-center text-sm text-[var(--color-text-secondary)]">
-                Nenhum contato nessa faixa. Tudo em dia ou ainda sem dados.
-              </div>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {priority.map((c) => {
-                  const days = daysSinceContact(c.last_contacted_at);
-                  return (
-                    <li key={c.id}>
-                      <Link
-                        href={`/app/contacts/${c.id}/edit`}
-                        className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-[var(--color-accent)] transition-colors"
-                      >
-                        <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                          {c.name}
-                        </span>
-                        <span className="text-xs text-[var(--color-text-tertiary)] shrink-0">
-                          {days === null ? "Nunca" : `${days}d sem contato`}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Cake size={16} strokeWidth={1.5} className="text-[var(--color-chart-rose)]" />
-              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] pl-1 border-l-2 border-[color-mix(in_srgb,var(--color-chart-rose)_35%,transparent)]">
-                Aniversários (7 dias)
-              </h2>
-            </div>
-            {birthdays.length === 0 ? (
-              <div className="glass-card rounded-xl p-8 text-center text-sm text-[var(--color-text-secondary)]">
+            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
+              Aniversários (7 dias)
+            </h2>
+          </div>
+          {birthdays.length === 0 ? (
+            <div className="glass-card rounded-[var(--radius-card)] p-8 text-center">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Nenhum aniversário nesta janela.
-              </div>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {birthdays.map((c) => {
-                  const d = daysUntilBirthday(c.birthday);
-                  return (
-                    <li key={c.id}>
-                      <Link
-                        href={`/app/contacts/${c.id}/edit`}
-                        className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-[color-mix(in_srgb,var(--color-chart-rose)_42%,var(--color-border))] transition-colors"
-                      >
-                        <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                          {c.name}
-                        </span>
-                        <span className="text-xs font-medium text-[var(--color-chart-rose)] shrink-0">
-                          {d === 0 ? "Hoje" : `Em ${d}d`}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-        </div>
+              </p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {birthdays.map((c) => {
+                const d = daysUntilBirthday(c.birthday);
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/app/contacts?edit=${c.id}`}
+                      className="glass-card rounded-[var(--radius-control)] px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-pink-500/30 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+                        {c.name}
+                      </span>
+                      <span className={`text-xs font-semibold shrink-0 ${d === 0 ? "text-pink-400" : "text-[var(--color-text-tertiary)]"}`}>
+                        {d === 0 ? "Hoje" : `Em ${d}d`}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       </div>
+
     </div>
   );
 }

@@ -29,43 +29,46 @@ export function getCooldownStatus(
   return "hot";
 }
 
+function todayMidnight(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Parse a YYYY-MM-DD date string in LOCAL time (avoids UTC-offset shifting the day). */
+function parseDateLocal(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
+}
+
 export function isBirthdaySoon(
   birthday: string | null,
   withinDays = 7,
 ): boolean {
   if (!birthday) return false;
-  const today = new Date();
-  const bday = new Date(birthday);
-  const thisYear = new Date(
-    today.getFullYear(),
-    bday.getMonth(),
-    bday.getDate(),
-  );
+  const today = todayMidnight();
+  const bday = parseDateLocal(birthday);
+  const thisYear = new Date(today.getFullYear(), bday.getMonth(), bday.getDate());
 
   if (thisYear < today) {
     thisYear.setFullYear(thisYear.getFullYear() + 1);
   }
 
-  const diff = thisYear.getTime() - today.getTime();
-  const daysUntil = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const daysUntil = Math.round((thisYear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   return daysUntil >= 0 && daysUntil <= withinDays;
 }
 
 export function daysUntilBirthday(birthday: string | null): number | null {
   if (!birthday) return null;
-  const today = new Date();
-  const bday = new Date(birthday);
-  const thisYear = new Date(
-    today.getFullYear(),
-    bday.getMonth(),
-    bday.getDate(),
-  );
+  const today = todayMidnight();
+  const bday = parseDateLocal(birthday);
+  const thisYear = new Date(today.getFullYear(), bday.getMonth(), bday.getDate());
 
   if (thisYear < today) {
     thisYear.setFullYear(thisYear.getFullYear() + 1);
   }
 
-  return Math.ceil((thisYear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.round((thisYear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 const WHATSAPP_PREFILL_MAX_CHARS = 1800;

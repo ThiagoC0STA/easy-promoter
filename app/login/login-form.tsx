@@ -60,20 +60,12 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
   }
 
   return (
-    <div className="glass-card rounded-[var(--radius-card)] p-7 sm:p-9 w-full max-w-[420px] mx-auto">
-      <div className="mb-7">
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-[color-mix(in_srgb,var(--color-accent)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_18%,transparent)]"
-          >
-            <Lock size={20} strokeWidth={1.5} className="text-[var(--color-accent)]" />
-          </div>
-          <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
-            Entrar
-          </h2>
-        </div>
-        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+    <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-7 sm:p-8 w-full max-w-[400px] mx-auto shadow-[var(--shadow-sm)]">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">
+          Entrar
+        </h2>
+        <p className="text-sm text-[var(--color-text-tertiary)] mt-1.5">
           {usePassword
             ? "Use seu e-mail e senha para acessar."
             : "Informe seu e-mail e receba um link de acesso."}
@@ -142,7 +134,7 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
           </label>
         )}
 
-        <button type="submit" disabled={busy} className="btn-primary w-full !py-3 disabled:opacity-60 disabled:cursor-not-allowed">
+        <button type="submit" disabled={busy} className="btn-primary w-full !h-11 disabled:opacity-60 disabled:cursor-not-allowed">
           {busy ? (
             <span className="flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

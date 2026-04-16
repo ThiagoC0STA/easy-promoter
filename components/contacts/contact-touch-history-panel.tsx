@@ -87,6 +87,11 @@ export function ContactTouchHistoryPanel({ contactId }: Props) {
               <span className="text-[var(--color-text-primary)] font-medium">
                 {kindLabel(e.kind)}
               </span>
+              {e.note && (
+                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-snug">
+                  {e.note}
+                </p>
+              )}
             </li>
           ))}
         </ul>

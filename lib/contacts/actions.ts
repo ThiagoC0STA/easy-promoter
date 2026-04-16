@@ -6,9 +6,16 @@ import { getCurrentUser } from "@/lib/auth/get-profile";
 import {
   createContact,
   deleteContact,
+  getContactById,
   touchContact,
   updateContact,
 } from "./queries";
+import type { Contact } from "./types";
+import {
+  createContactGroup,
+  renameContactGroup,
+  deleteContactGroup,
+} from "./groups";
 import type { ImportContactPayload } from "./csv-import";
 import type { ContactInsert, ContactUpdate } from "./types";
 
@@ -72,6 +79,7 @@ function buildPayload(
     responded: str(formData, "responded"),
     last_contacted_at: str(formData, "last_contacted_at"),
     notes: str(formData, "notes"),
+    group_id: str(formData, "group_id"),
   };
 }
 
@@ -83,12 +91,13 @@ export async function createContactAction(formData: FormData) {
   try {
     await createContact({ ...payload, owner_id: user.id });
   } catch (e) {
-    redirectWithContactError("/app/contacts?novo=1", e);
+    const tabParam = payload.group_id ? `&tab=${payload.group_id}` : "";
+    redirectWithContactError(`/app/contacts?novo=1${tabParam}`, e);
   }
 
   revalidatePath("/app");
   revalidatePath("/app/contacts");
-  redirect("/app/contacts");
+  redirect(payload.group_id ? `/app/contacts?tab=${payload.group_id}` : "/app/contacts");
 }
 
 export async function updateContactAction(formData: FormData) {
@@ -105,12 +114,31 @@ export async function updateContactAction(formData: FormData) {
   try {
     await updateContact(id, payload);
   } catch (e) {
-    redirectWithContactError(`/app/contacts/${id}/edit`, e);
+    redirectWithContactError(`/app/contacts?edit=${id}`, e);
   }
 
   revalidatePath("/app");
   revalidatePath("/app/contacts");
-  redirect("/app/contacts");
+  const tabParam = payload.group_id ? `?tab=${payload.group_id}` : "";
+  redirect(`/app/contacts${tabParam}`);
+}
+
+export type FetchContactResult =
+  | { ok: true; contact: Contact }
+  | { ok: false; message: string };
+
+export async function fetchContactByIdAction(
+  id: string,
+): Promise<FetchContactResult> {
+  const { user } = await getCurrentUser();
+  if (!user) return { ok: false, message: "Sessão expirada." };
+  try {
+    const contact = await getContactById(id);
+    if (!contact) return { ok: false, message: "Contato não encontrado." };
+    return { ok: true, contact };
+  } catch (e) {
+    return { ok: false, message: userFacingContactSaveError(e) };
+  }
 }
 
 export async function deleteContactAction(formData: FormData) {
@@ -126,7 +154,7 @@ export async function deleteContactAction(formData: FormData) {
   try {
     await deleteContact(id);
   } catch (e) {
-    redirectWithContactError(`/app/contacts/${id}/edit`, e);
+    redirectWithContactError(`/app/contacts?edit=${id}`, e);
   }
 
   revalidatePath("/app");
@@ -187,7 +215,7 @@ export async function importContactsBulkAction(
       whatsapp: r.whatsapp?.trim() || null,
       instagram: r.instagram?.trim() || null,
       birthday: r.birthday?.trim() || null,
-      genres: [],
+      genres: Array.isArray((r as { genres?: string[] }).genres) ? (r as { genres?: string[] }).genres! : [],
       segments: Array.isArray(r.segments) ? r.segments : [],
       frequency: null,
       spending: null,
@@ -196,7 +224,8 @@ export async function importContactsBulkAction(
       confirmed: null,
       responded: null,
       last_contacted_at: null,
-      notes: null,
+      notes: (r as { notes?: string | null }).notes ?? null,
+      group_id: null,
     };
 
     try {
@@ -210,6 +239,46 @@ export async function importContactsBulkAction(
   revalidatePath("/app");
   revalidatePath("/app/contacts");
   return { ok: true, inserted, errors };
+}
+
+// ─── Contact group actions ───────────────────────────────────────────────────
+
+export type GroupActionResult = { ok: true; id?: string } | { ok: false; message: string };
+
+export async function createGroupAction(name: string): Promise<GroupActionResult> {
+  const { user } = await getCurrentUser();
+  if (!user) return { ok: false, message: "Sessão expirada." };
+  try {
+    const group = await createContactGroup(name.trim() || "Nova lista");
+    revalidatePath("/app/contacts");
+    return { ok: true, id: group?.id };
+  } catch (e) {
+    return { ok: false, message: String((e as Error).message) };
+  }
+}
+
+export async function renameGroupAction(id: string, name: string): Promise<GroupActionResult> {
+  const { user } = await getCurrentUser();
+  if (!user) return { ok: false, message: "Sessão expirada." };
+  try {
+    await renameContactGroup(id, name.trim());
+    revalidatePath("/app/contacts");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: String((e as Error).message) };
+  }
+}
+
+export async function deleteGroupAction(id: string): Promise<GroupActionResult> {
+  const { user } = await getCurrentUser();
+  if (!user) return { ok: false, message: "Sessão expirada." };
+  try {
+    await deleteContactGroup(id);
+    revalidatePath("/app/contacts");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: String((e as Error).message) };
+  }
 }
 
 export type TouchContactResult =

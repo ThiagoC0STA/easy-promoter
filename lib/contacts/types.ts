@@ -79,6 +79,7 @@ export type Contact = {
   responded: string | null;
   last_contacted_at: string | null;
   notes: string | null;
+  group_id: string | null;
   created_at: string;
   updated_at: string;
 };

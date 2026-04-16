@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* Explicit :root vars so var() always resolves — @theme inline doesn't create CSS custom properties */
+:root {
+  --color-surface: #f6f7fb;
+  --color-surface-secondary: #eef0f6;
+  --color-surface-elevated: #ffffff;
+  --color-border: #e1e4ed;
+  --color-border-subtle: #eceff5;
+  --color-text-primary: #0b1020;
+  --color-text-secondary: #4b5674;
+  --color-text-tertiary: #6b7388;
+  --color-accent: #5b4cdb;
+  --color-accent-light: #9d92f6;
+  --color-success: #0d9f78;
+  --color-error: #e4563c;
+  --color-chart-violet: #5b21b6;
+  --color-chart-rose: #be123c;
+  --color-chart-emerald: #047857;
+  --color-chart-sky: #0369a1;
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -52,6 +74,21 @@
   animation: ep-slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Contact table shared grid — set --ep-cgrid on the container, rows inherit */
+.ep-contact-header-grid {
+  display: grid;
+  grid-template-columns: var(--ep-cgrid, 1fr auto);
+}
+.ep-contact-row-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+@media (min-width: 640px) {
+  .ep-contact-row-grid {
+    grid-template-columns: var(--ep-cgrid, 1fr auto);
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -102,33 +139,8 @@ body {
 
 .surface-hero {
   position: relative;
-  overflow: hidden;
-  border-radius: calc(var(--radius-card) + 0.125rem);
-  border: 1px solid color-mix(in srgb, var(--color-border) 78%, var(--color-accent) 22%);
-  background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-surface-elevated) 92%, var(--color-accent-muted)) 0%,
-      var(--color-surface-elevated) 48%,
-      var(--color-surface-elevated) 100%
-    );
-  box-shadow: var(--shadow-md);
-}
-
-.surface-hero::before {
-  content: "";
-  position: absolute;
-  inset: -40% -20% auto 40%;
-  height: 70%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-accent) 16%, transparent),
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
-.surface-hero > * {
-  position: relative;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: 1.25rem;
 }
 
 :where(a, button, input, select, textarea):focus-visible {
@@ -234,19 +246,14 @@ body {
 }
 
 .glass-card {
-  background: color-mix(in srgb, var(--color-surface-elevated) 68%, transparent);
-  backdrop-filter: blur(24px) saturate(165%);
-  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .glass-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border));
-  box-shadow: 0 0 0 1px var(--color-accent-muted),
-    0 10px 36px -16px color-mix(in srgb, var(--color-accent) 18%, transparent);
-  transform: none;
+  border-color: color-mix(in srgb, var(--color-text-tertiary) 40%, var(--color-border));
 }
 
 /* Dashboard chart tiles: same glass look, no lift or accent border on hover */
@@ -269,33 +276,27 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
+  padding: 0.625rem 1.125rem;
+  border-radius: var(--radius-control);
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   line-height: 1;
   color: #fff;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent),
-    var(--color-accent-light)
-  );
-  box-shadow: 0 2px 12px -2px color-mix(in srgb, var(--color-accent) 45%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: all 0.2s ease;
+  background: var(--color-accent);
+  box-shadow: 0 1px 0 color-mix(in srgb, #000 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
   cursor: pointer;
   border: none;
   text-decoration: none;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 4px 20px -2px color-mix(in srgb, var(--color-accent) 55%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
+  filter: brightness(1.08);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  filter: brightness(0.95);
 }
 
 .btn-secondary {

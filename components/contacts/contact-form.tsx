@@ -29,6 +29,7 @@ type Props = {
   actionError?: string | null;
   /** Full page (default) or compact body for slide-over panel */
   layout?: "page" | "sheet";
+  defaultGroupId?: string | null;
 };
 
 function FieldHint({ children }: { children: React.ReactNode }) {
@@ -43,6 +44,7 @@ export function ContactForm({
   contact,
   actionError,
   layout = "page",
+  defaultGroupId,
 }: Props) {
   const isEdit = Boolean(contact);
   const action = isEdit ? updateContactAction : createContactAction;
@@ -82,6 +84,9 @@ export function ContactForm({
 
       <form action={action} className="flex flex-col gap-6">
         {isEdit && <input type="hidden" name="id" value={contact!.id} />}
+        {(defaultGroupId ?? contact?.group_id) && (
+          <input type="hidden" name="group_id" value={defaultGroupId ?? contact?.group_id ?? ""} />
+        )}
         <input type="hidden" name="genres" value={genres.join(",")} />
 
         <fieldset className="glass-card rounded-[var(--radius-card)] p-6 flex flex-col gap-5">
