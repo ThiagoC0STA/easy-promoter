@@ -29,7 +29,7 @@ Use este arquivo para marcar o que já foi feito e o que vem na sequência. Marq
 
 ## Médio prazo
 
-- [ ] Templates de mensagem (copiar antes de abrir WhatsApp)
+- [x] Modelos de mensagem: removidos do produto (texto único no link do WhatsApp)
 - [ ] Meta semanal (“N contatos esta semana”) com barra no dashboard
 - [ ] Alerta de possível duplicado (mesmo WhatsApp ou nome muito parecido)
 - [ ] Tabela de convites no admin (pendente, aceito, reenviar)

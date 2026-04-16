@@ -1,6 +1,7 @@
-import { Activity, Cake, Users } from "lucide-react";
+import { Activity, Cake, MessageCircle, Users } from "lucide-react";
 import type { Contact } from "@/lib/contacts/types";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
+import { countContactsTouchedInRollingDays } from "@/lib/dashboard/weekly-touch-stats";
 import { daysSinceContact, isBirthdaySoon } from "@/lib/contacts/utils";
 
 type Props = {
@@ -15,6 +16,8 @@ export function StatsCards({ contacts }: Props) {
     return days === null || days >= COOLDOWN_DAYS;
   }).length;
 
+  const touchedWeek = countContactsTouchedInRollingDays(contacts, 7);
+
   const cards = [
     {
       Icon: Users,
@@ -22,6 +25,7 @@ export function StatsCards({ contacts }: Props) {
       value: total,
       gradient: "from-violet-500/20 to-blue-500/20",
       iconColor: "text-violet-500",
+      hint: null as string | null,
     },
     {
       Icon: Cake,
@@ -29,6 +33,7 @@ export function StatsCards({ contacts }: Props) {
       value: birthdays,
       gradient: "from-pink-500/20 to-orange-500/20",
       iconColor: "text-pink-500",
+      hint: null as string | null,
     },
     {
       Icon: Activity,
@@ -36,12 +41,21 @@ export function StatsCards({ contacts }: Props) {
       value: needsAttention,
       gradient: "from-emerald-500/20 to-cyan-500/20",
       iconColor: "text-emerald-500",
+      hint: null as string | null,
+    },
+    {
+      Icon: MessageCircle,
+      label: "Toques em 7 dias",
+      value: touchedWeek,
+      gradient: "from-sky-500/20 to-indigo-500/15",
+      iconColor: "text-sky-600",
+      hint: "Último contato registrado nos últimos 7 dias.",
     },
   ] as const;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {cards.map(({ Icon, label, value, gradient, iconColor }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      {cards.map(({ Icon, label, value, gradient, iconColor, hint }) => (
         <div
           key={label}
           className="glass-card rounded-[var(--radius-card)] p-5 flex items-center gap-4"
@@ -57,6 +71,9 @@ export function StatsCards({ contacts }: Props) {
             </p>
             <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
               {label}
+              {hint ? (
+                <span className="block text-[10px] font-normal mt-0.5 opacity-90">{hint}</span>
+              ) : null}
             </p>
           </div>
         </div>

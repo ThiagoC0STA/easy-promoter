@@ -17,6 +17,12 @@ export const metadata: Metadata = {
   title: "Easy Promoter",
   description:
     "Lightweight CRM for promoters: contacts, cooldowns, and invites.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Easy Promoter",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({

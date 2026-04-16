@@ -1,4 +1,6 @@
 import { AppHeader } from "@/components/layout/app-header";
+import { OnlineStatusBanner } from "@/components/layout/online-status-banner";
+import { AppOnboarding } from "@/components/onboarding/app-onboarding";
 
 export default function AuthedShellLayout({
   children,
@@ -14,9 +16,11 @@ export default function AuthedShellLayout({
         Ir para o conteúdo
       </a>
       <AppHeader />
+      <OnlineStatusBanner />
       <main id="main-content" className="flex-1 relative" tabIndex={-1}>
         <div className="relative">{children}</div>
       </main>
+      <AppOnboarding />
     </div>
   );
 }

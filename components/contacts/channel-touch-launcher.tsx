@@ -3,8 +3,13 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { Phone } from "lucide-react";
 import { touchContactByIdAction } from "@/lib/contacts/actions";
+import { WhatsAppGlyph } from "@/components/icons/whatsapp-glyph";
+import {
+  getFollowUpDate,
+  setFollowUpDate,
+} from "@/lib/contacts/followup-storage";
+import { appendTouchHistoryEntry } from "@/lib/contacts/touch-history-storage";
 
 export type ContactChannel = "whatsapp" | "instagram";
 
@@ -63,6 +68,7 @@ export function ChannelTouchLauncher({
   const [open, setOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [touchError, setTouchError] = React.useState<string | null>(null);
+  const [followUpDate, setFollowUpDateState] = React.useState("");
   const t = COPY[channel];
   const titleId = `channel-touch-${channel}-${contactId}`;
 
@@ -86,8 +92,18 @@ export function ChannelTouchLauncher({
     };
   }, [open, busy]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    setTouchError(null);
+    setFollowUpDateState(getFollowUpDate(contactId) ?? "");
+  }, [open, contactId]);
+
   function handleOpen() {
     setTouchError(null);
+    appendTouchHistoryEntry(
+      contactId,
+      channel === "whatsapp" ? "whatsapp_opened" : "instagram_opened",
+    );
     window.open(href, "_blank", "noopener,noreferrer");
     setOpen(true);
   }
@@ -101,6 +117,8 @@ export function ChannelTouchLauncher({
         setTouchError(result.message);
         return;
       }
+      appendTouchHistoryEntry(contactId, "touch_confirmed");
+      setFollowUpDate(contactId, followUpDate.trim() || null);
       setOpen(false);
       router.refresh();
     } finally {
@@ -154,6 +172,18 @@ export function ChannelTouchLauncher({
               {touchError}
             </p>
           ) : null}
+          <label className="flex flex-col gap-1.5 mb-5">
+            <span className="text-xs font-medium text-[var(--color-text-tertiary)]">
+              Próximo contato planejado (opcional, só neste aparelho)
+            </span>
+            <input
+              type="date"
+              value={followUpDate}
+              onChange={(e) => setFollowUpDateState(e.target.value)}
+              disabled={busy}
+              className="input-field min-h-11 max-w-xs"
+            />
+          </label>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
             <button
               type="button"
@@ -189,7 +219,7 @@ export function ChannelTouchLauncher({
         className={btnClass}
       >
         {channel === "whatsapp" ? (
-          <Phone size={16} strokeWidth={1.5} aria-hidden />
+          <WhatsAppGlyph size={18} />
         ) : (
           <InstagramGlyph />
         )}

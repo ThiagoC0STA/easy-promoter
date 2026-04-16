@@ -3,8 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Shield, Users } from "lucide-react";
+import { HelpCircle, LayoutDashboard, LogOut, Shield, Users } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import {
+  KeyboardShortcutsModal,
+  useGlobalShortcutHelp,
+} from "@/components/layout/keyboard-shortcuts-modal";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type { ProfileRole } from "@/lib/auth/types";
 
@@ -13,6 +17,11 @@ export function AppHeader() {
   const supabase = React.useMemo(() => createBrowserSupabaseClient(), []);
   const [email, setEmail] = React.useState<string | null>(null);
   const [role, setRole] = React.useState<ProfileRole | null>(null);
+  const [shortcutsOpen, setShortcutsOpen] = React.useState(false);
+
+  const showAppHelp =
+    Boolean(email) &&
+    (pathname.startsWith("/app") || pathname.startsWith("/admin"));
 
   const dashboardActive =
     pathname === "/app" || pathname === "/app/";
@@ -55,6 +64,11 @@ export function AppHeader() {
       sub.subscription.unsubscribe();
     };
   }, [supabase]);
+
+  useGlobalShortcutHelp(
+    () => setShortcutsOpen(true),
+    showAppHelp && !shortcutsOpen,
+  );
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-[var(--color-border)]">
@@ -110,6 +124,20 @@ export function AppHeader() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            {showAppHelp ? (
+              <button
+                type="button"
+                onClick={() => setShortcutsOpen(true)}
+                className="flex items-center justify-center w-9 h-9 rounded-full
+                           text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]
+                           hover:bg-[var(--color-accent-muted)] transition-all duration-200 cursor-pointer
+                           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+                title="Atalhos de teclado"
+                aria-label="Abrir lista de atalhos de teclado"
+              >
+                <HelpCircle size={18} strokeWidth={1.5} />
+              </button>
+            ) : null}
             {email ? (
               <div className="flex items-center gap-3">
                 <span
@@ -155,6 +183,11 @@ export function AppHeader() {
           </MobileNavLink>
         )}
       </div>
+
+      <KeyboardShortcutsModal
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
+      />
     </header>
   );
 }

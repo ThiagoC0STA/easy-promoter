@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { AlertCircle, ArrowRight, CheckCircle2, Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -172,6 +173,15 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
             : "Entrar com e-mail e senha"}
         </button>
       </div>
+
+      <p className="mt-6 text-center text-xs text-[var(--color-text-tertiary)] flex flex-wrap justify-center gap-x-4 gap-y-1">
+        <Link href="/privacidade" className="hover:text-[var(--color-accent)] transition-colors">
+          Política de privacidade
+        </Link>
+        <Link href="/termos" className="hover:text-[var(--color-accent)] transition-colors">
+          Termos de uso
+        </Link>
+      </p>
     </div>
   );
 }

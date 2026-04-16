@@ -1,4 +1,5 @@
-import { Shield, Users } from "lucide-react";
+import Link from "next/link";
+import { Activity, ScrollText, Shield, Users } from "lucide-react";
 import { InviteForm } from "@/components/admin/invite-form";
 import { PromotersList } from "@/components/admin/promoters-list";
 import { getPromoters } from "@/lib/admin/queries";
@@ -22,6 +23,23 @@ export default async function AdminHomePage() {
             Convites e visão geral dos promoters
           </p>
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-8 text-sm">
+        <Link
+          href="/admin/changelog"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+        >
+          <ScrollText size={16} strokeWidth={1.5} aria-hidden />
+          Changelog
+        </Link>
+        <Link
+          href="/admin/health"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+        >
+          <Activity size={16} strokeWidth={1.5} aria-hidden />
+          Saúde do app
+        </Link>
       </div>
 
       <div className="flex flex-col gap-10">

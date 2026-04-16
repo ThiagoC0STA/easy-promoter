@@ -1,22 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { Cake, Edit, Phone } from "lucide-react";
+import { Cake, Edit } from "lucide-react";
+import { WhatsAppGlyph } from "@/components/icons/whatsapp-glyph";
 import type { Contact } from "@/lib/contacts/types";
 import {
   daysSinceContact,
+  defaultWhatsappPrefillText,
   formatInstagramUrl,
   formatWhatsappUrl,
   getCooldownStatus,
   isBirthdaySoon,
   daysUntilBirthday,
 } from "@/lib/contacts/utils";
+import { getApproachHint } from "@/lib/contacts/approach-hint";
 import { CooldownBadge } from "./cooldown-badge";
 import { ChannelTouchLauncher } from "./channel-touch-launcher";
 
 type Props = {
   contact: Contact;
   readOnly?: boolean;
+  /** Tighter layout for power users (toggle on contacts list). */
+  compact?: boolean;
 };
 
 function InstagramGlyphStatic() {
@@ -39,16 +44,22 @@ function InstagramGlyphStatic() {
   );
 }
 
-export function ContactRow({ contact, readOnly = false }: Props) {
+export function ContactRow({ contact, readOnly = false, compact = false }: Props) {
   const days = daysSinceContact(contact.last_contacted_at);
   const status = getCooldownStatus(contact.last_contacted_at);
-  const waUrl = formatWhatsappUrl(contact.whatsapp);
   const igUrl = formatInstagramUrl(contact.instagram);
   const bdaySoon = isBirthdaySoon(contact.birthday);
   const bdayDays = daysUntilBirthday(contact.birthday);
+  const approach = getApproachHint(contact);
+  const waUrl = formatWhatsappUrl(contact.whatsapp, {
+    prefilledText: defaultWhatsappPrefillText(contact.name),
+  });
 
   return (
-    <div className="glass-card rounded-[var(--radius-card)] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 group">
+    <div
+      className={`glass-card rounded-[var(--radius-card)] flex flex-col sm:flex-row sm:items-center group overflow-visible
+        ${compact ? "p-3 sm:py-3 sm:px-4 gap-2 sm:gap-3" : "p-4 sm:p-5 gap-3 sm:gap-4"}`}
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
@@ -94,6 +105,11 @@ export function ContactRow({ contact, readOnly = false }: Props) {
             </div>
           )}
         </div>
+        {approach ? (
+          <p className="text-[11px] text-[var(--color-text-tertiary)] leading-snug mt-2 max-w-prose">
+            {approach}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
@@ -116,7 +132,7 @@ export function ContactRow({ contact, readOnly = false }: Props) {
                          hover:text-emerald-500 hover:bg-emerald-500/10 transition-all
                          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
             >
-              <Phone size={16} strokeWidth={1.5} aria-hidden />
+              <WhatsAppGlyph size={18} />
             </a>
           ))}
         {igUrl &&

@@ -3,7 +3,10 @@ import { ArrowRight, Cake, LayoutDashboard, Users } from "lucide-react";
 import type { Contact } from "@/lib/contacts/types";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { StatsCards } from "@/components/contacts/stats-cards";
+import { DayQueueFreshnessBanner } from "@/components/dashboard/day-queue-freshness-banner";
+import { DayQueueSection } from "@/components/dashboard/day-queue-section";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
+import { buildSegmentInsightLines } from "@/lib/dashboard/segment-insights";
 import {
   daysSinceContact,
   isBirthdaySoon,
@@ -42,6 +45,8 @@ export function PromoterDashboard({ contacts }: Props) {
       return da - db;
     })
     .slice(0, 6);
+
+  const segmentLines = buildSegmentInsightLines(contacts);
 
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
@@ -92,7 +97,28 @@ export function PromoterDashboard({ contacts }: Props) {
       </div>
 
       <div className="flex flex-col gap-10">
+        <DayQueueFreshnessBanner contacts={contacts} />
         <StatsCards contacts={contacts} />
+
+        {segmentLines.length > 0 ? (
+          <section aria-label="Resumo por segmento">
+            <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-2">
+              Resumo por segmento
+            </h2>
+            <ul className="flex flex-col gap-1.5">
+              {segmentLines.map((line, i) => (
+                <li
+                  key={`segment-insight-${i}`}
+                  className="text-sm text-[var(--color-text-secondary)] leading-relaxed"
+                >
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        <DayQueueSection contacts={contacts} />
 
         <section>
           <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-3">

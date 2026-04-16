@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Users } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth/get-profile";
 import { getContacts } from "@/lib/contacts/queries";
@@ -33,6 +34,16 @@ export default async function ContactsListPage({
           <p className="text-sm text-[var(--color-text-secondary)] max-w-xl">
             Gerencie a base, refine com busca e filtros, e abra WhatsApp ou Instagram
             com um toque.
+          </p>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
+            <Link
+              href="/app/contacts/import"
+              className="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              Importar CSV
+            </Link>
+            {" · "}
+            Export disponível na lista após carregar os contatos.
           </p>
         </div>
       </div>

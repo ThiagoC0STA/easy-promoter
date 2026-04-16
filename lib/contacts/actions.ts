@@ -9,6 +9,7 @@ import {
   touchContact,
   updateContact,
 } from "./queries";
+import type { ImportContactPayload } from "./csv-import";
 import type { ContactInsert, ContactUpdate } from "./types";
 
 function userFacingContactSaveError(error: unknown): string {
@@ -128,6 +129,84 @@ export async function deleteContactAction(formData: FormData) {
   revalidatePath("/app");
   revalidatePath("/app/contacts");
   redirect("/app/contacts");
+}
+
+const IMPORT_MAX_ROWS = 200;
+
+export type ImportContactsBulkResult =
+  | { ok: true; inserted: number; errors: string[] }
+  | { ok: false; message: string };
+
+export async function importContactsBulkAction(
+  formData: FormData,
+): Promise<ImportContactsBulkResult> {
+  const { user } = await getCurrentUser();
+  if (!user) {
+    return { ok: false, message: "Sessão expirada. Entre de novo." };
+  }
+
+  const raw = formData.get("payload");
+  if (typeof raw !== "string" || !raw.trim()) {
+    return { ok: false, message: "Nenhum dado para importar." };
+  }
+
+  let rows: ImportContactPayload[];
+  try {
+    rows = JSON.parse(raw) as ImportContactPayload[];
+  } catch {
+    return { ok: false, message: "Formato de dados inválido." };
+  }
+
+  if (!Array.isArray(rows)) {
+    return { ok: false, message: "Lista de contatos inválida." };
+  }
+
+  if (rows.length > IMPORT_MAX_ROWS) {
+    return {
+      ok: false,
+      message: `Máximo de ${IMPORT_MAX_ROWS} linhas por importação. Divida o arquivo.`,
+    };
+  }
+
+  const errors: string[] = [];
+  let inserted = 0;
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r?.name?.trim()) {
+      errors.push(`Linha ${i + 1}: nome obrigatório.`);
+      continue;
+    }
+
+    const payload: ContactInsert = {
+      owner_id: user.id,
+      name: r.name.trim(),
+      whatsapp: r.whatsapp?.trim() || null,
+      instagram: r.instagram?.trim() || null,
+      birthday: r.birthday?.trim() || null,
+      genres: [],
+      segments: Array.isArray(r.segments) ? r.segments : [],
+      frequency: null,
+      spending: null,
+      post_type: null,
+      reach: null,
+      confirmed: null,
+      responded: null,
+      last_contacted_at: null,
+      notes: null,
+    };
+
+    try {
+      await createContact(payload);
+      inserted++;
+    } catch (e) {
+      errors.push(`Linha ${i + 1}: ${userFacingContactSaveError(e)}`);
+    }
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/app/contacts");
+  return { ok: true, inserted, errors };
 }
 
 export type TouchContactResult =

@@ -21,6 +21,8 @@ import {
 } from "@/lib/contacts/actions";
 import { FormPendingButton } from "@/components/ui/form-pending-button";
 import { ActionErrorBanner } from "@/components/ui/action-error-banner";
+import { ContactFollowUpBlock } from "@/components/contacts/contact-follow-up-block";
+import { ContactTouchHistoryPanel } from "@/components/contacts/contact-touch-history-panel";
 
 type Props = {
   contact?: Contact;
@@ -81,7 +83,10 @@ export function ContactForm({ contact, actionError }: Props) {
           </legend>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-[var(--color-text-primary)]">
+            <span
+              className="text-sm font-medium text-[var(--color-text-primary)]"
+              title="Obrigatório. Nome como você chama a pessoa na operação."
+            >
               Nome *
             </span>
             <input
@@ -143,7 +148,10 @@ export function ContactForm({ contact, actionError }: Props) {
               />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-[var(--color-text-primary)]">
+              <span
+                className="text-sm font-medium text-[var(--color-text-primary)]"
+                title="Usada para o cooldown visual e para priorizar quem precisa de retomada."
+              >
                 Último contato
               </span>
               <input
@@ -192,7 +200,10 @@ export function ContactForm({ contact, actionError }: Props) {
         </fieldset>
 
         <fieldset className="glass-card rounded-[var(--radius-card)] p-6 flex flex-col gap-5">
-          <legend className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-1">
+          <legend
+            className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-1"
+            title="Um contato pode estar em mais de um segmento. Isso alimenta filtros e o resumo na dashboard."
+          >
             Segmentos
           </legend>
           <div className="flex flex-wrap gap-3">
@@ -273,6 +284,13 @@ export function ContactForm({ contact, actionError }: Props) {
             />
           </label>
         </fieldset>
+
+        {isEdit && contact ? (
+          <div className="flex flex-col gap-5">
+            <ContactFollowUpBlock contactId={contact.id} />
+            <ContactTouchHistoryPanel contactId={contact.id} />
+          </div>
+        ) : null}
 
         <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between pt-2 border-t border-[var(--color-border-subtle)]">
           {isEdit && (

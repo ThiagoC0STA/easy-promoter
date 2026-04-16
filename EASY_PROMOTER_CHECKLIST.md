@@ -121,6 +121,16 @@ Checklist para evoluir do fluxo em planilha para um app com **Supabase** (dados,
 
 ---
 
+## 9. Roadmap de produto (ideias além do MVP)
+
+Checklist detalhado com todas as ideias priorizáveis: **`IDEIAS_PRODUTO.md`** (itens da leva **1.1** já marcados lá: fila do dia, CSV, onboarding, atalhos, compacto, manifest, legal).
+
+- [ ] Ler `IDEIAS_PRODUTO.md` e escolher a leva da próxima versão (regra 3 + 2 do topo desse arquivo)
+- [ ] Marcar itens concluídos diretamente em `IDEIAS_PRODUTO.md` com `[x]`
+- [ ] Quando uma ideia exigir mudança no banco ou RLS, acrescentar subtarefa em `EASY_PROMOTER_CHECKLIST.md` nas seções 3 ou 4
+
+---
+
 ## Legenda rapida
 
 | Item na planilha atual | No app |

@@ -2,15 +2,18 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, SearchX, UserX } from "lucide-react";
+import { Download, LayoutList, Plus, SearchX, UserX } from "lucide-react";
 import type { Contact } from "@/lib/contacts/types";
 import {
   applyContactListQuery,
   DEFAULT_CONTACT_LIST_FILTERS,
   isDefaultContactListFilters,
 } from "@/lib/contacts/contact-list-utils";
+import { downloadContactsCsv } from "@/lib/contacts/export-contacts-csv";
 import { FilterBar } from "./filter-bar";
 import { ContactRow } from "./contact-row";
+
+const COMPACT_STORAGE_KEY = "ep_contacts_compact_v1";
 
 type Props = {
   contacts: Contact[];
@@ -24,6 +27,27 @@ export function ContactsTable({
   showAddButton = true,
 }: Props) {
   const [filters, setFilters] = React.useState({ ...DEFAULT_CONTACT_LIST_FILTERS });
+  const [compact, setCompact] = React.useState(false);
+
+  React.useEffect(() => {
+    try {
+      setCompact(window.localStorage.getItem(COMPACT_STORAGE_KEY) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function toggleCompact() {
+    setCompact((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(COMPACT_STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
 
   const filtered = React.useMemo(
     () => applyContactListQuery(contacts, filters),
@@ -111,23 +135,56 @@ export function ContactsTable({
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <p
-            className="text-xs text-[var(--color-text-tertiary)]"
-            role="status"
-            aria-live="polite"
-          >
-            Mostrando{" "}
-            <span className="font-semibold text-[var(--color-text-secondary)]">
-              {filtered.length}
-            </span>{" "}
-            de {contacts.length} contato{contacts.length !== 1 ? "s" : ""}
-            {hasActiveFilters ? " (filtrado)" : ""}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p
+              className="text-xs text-[var(--color-text-tertiary)]"
+              role="status"
+              aria-live="polite"
+            >
+              Mostrando{" "}
+              <span className="font-semibold text-[var(--color-text-secondary)]">
+                {filtered.length}
+              </span>{" "}
+              de {contacts.length} contato{contacts.length !== 1 ? "s" : ""}
+              {hasActiveFilters ? " (filtrado)" : ""}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => downloadContactsCsv(filtered)}
+                  title="CSV UTF-8 para Excel. Reflete filtros atuais. Guarde o arquivo em local seguro."
+                  className="inline-flex items-center gap-1.5 min-h-10 px-3 rounded-[var(--radius-control)] text-xs font-semibold border border-[var(--color-border)]
+                             bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]
+                             transition-colors cursor-pointer"
+                >
+                  <Download size={14} strokeWidth={1.75} aria-hidden />
+                  Exportar CSV
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={toggleCompact}
+                aria-pressed={compact}
+                title={compact ? "Mostrar mais espaço entre linhas" : "Mostrar mais linhas na tela"}
+                className={`inline-flex items-center gap-1.5 min-h-10 px-3 rounded-[var(--radius-control)] text-xs font-semibold border transition-colors cursor-pointer
+                  ${
+                    compact
+                      ? "border-[var(--color-accent)] bg-[var(--color-accent-muted)] text-[var(--color-accent)]"
+                      : "border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)]"
+                  }`}
+              >
+                <LayoutList size={14} strokeWidth={1.75} aria-hidden />
+                {compact ? "Confortável" : "Compacto"}
+              </button>
+            </div>
+          </div>
           {filtered.map((contact) => (
             <ContactRow
               key={contact.id}
               contact={contact}
               readOnly={readOnly}
+              compact={compact}
             />
           ))}
         </div>

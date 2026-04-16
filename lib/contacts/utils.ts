@@ -6,6 +6,17 @@ export function daysSinceContact(lastContactedAt: string | null): number | null 
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * True when last_contacted_at falls within the last `windowDays` calendar days (0 = today).
+ */
+export function wasContactedWithinRollingDays(
+  lastContactedAt: string | null,
+  windowDays: number,
+): boolean {
+  const d = daysSinceContact(lastContactedAt);
+  return d !== null && d >= 0 && d < windowDays;
+}
+
 export type CooldownStatus = "cold" | "warm" | "hot";
 
 export function getCooldownStatus(
@@ -57,11 +68,30 @@ export function daysUntilBirthday(birthday: string | null): number | null {
   return Math.ceil((thisYear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function formatWhatsappUrl(whatsapp: string | null): string | null {
+const WHATSAPP_PREFILL_MAX_CHARS = 1800;
+
+/** Single default line for wa.me ?text= (no template library). */
+export function defaultWhatsappPrefillText(contactName: string): string {
+  const name = contactName.trim();
+  const greet = name ? `Oi ${name}!` : "Oi!";
+  return `${greet} Tudo certo? Queria alinhar contigo sobre o próximo rolê.`;
+}
+
+export function formatWhatsappUrl(
+  whatsapp: string | null,
+  options?: { prefilledText?: string | null },
+): string | null {
   if (!whatsapp) return null;
   const digits = whatsapp.replace(/\D/g, "");
   if (!digits) return null;
-  return `https://wa.me/${digits}`;
+  const base = `https://wa.me/${digits}`;
+  const raw = options?.prefilledText?.trim();
+  if (!raw) return base;
+  const clipped =
+    raw.length > WHATSAPP_PREFILL_MAX_CHARS
+      ? raw.slice(0, WHATSAPP_PREFILL_MAX_CHARS)
+      : raw;
+  return `${base}?text=${encodeURIComponent(clipped)}`;
 }
 
 export function formatInstagramUrl(instagram: string | null): string | null {

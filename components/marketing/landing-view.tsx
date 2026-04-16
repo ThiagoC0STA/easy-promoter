@@ -207,13 +207,29 @@ export function LandingView({ user }: Props) {
 
       {/* Footer */}
       <footer className="border-t border-[var(--color-border)] bg-[var(--color-surface-secondary)]">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <span className="text-xs text-[var(--color-text-tertiary)]">
-            © {new Date().getFullYear()} Easy Promoter
-          </span>
-          <span className="text-xs text-[var(--color-text-tertiary)]">
-            Feito para promoters e casas noturnas
-          </span>
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-6 flex flex-col gap-4">
+          <div className="flex flex-wrap justify-center sm:justify-end gap-x-5 gap-y-2 text-xs">
+            <Link
+              href="/privacidade"
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors"
+            >
+              Privacidade
+            </Link>
+            <Link
+              href="/termos"
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors"
+            >
+              Termos
+            </Link>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              © {new Date().getFullYear()} Easy Promoter
+            </span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              Feito para promoters e casas noturnas
+            </span>
+          </div>
         </div>
       </footer>
     </div>
