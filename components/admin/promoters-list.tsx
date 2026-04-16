@@ -9,7 +9,7 @@ type Props = {
 export function PromotersList({ promoters }: Props) {
   if (promoters.length === 0) {
     return (
-      <div className="glass-card rounded-2xl p-8 text-center">
+      <div className="glass-card rounded-[var(--radius-card)] p-8 text-center">
         <p className="text-sm text-[var(--color-text-secondary)]">
           Nenhum promoter cadastrado.
         </p>
@@ -23,7 +23,7 @@ export function PromotersList({ promoters }: Props) {
         <Link
           key={p.id}
           href={`/admin/promoters/${p.id}`}
-          className="glass-card rounded-xl p-4 flex items-center justify-between gap-3 no-underline group"
+          className="glass-card rounded-[var(--radius-control)] p-4 flex items-center justify-between gap-3 no-underline group"
         >
           <div className="flex items-center gap-3 min-w-0">
             <div

@@ -42,7 +42,10 @@ export function StatsCards({ contacts }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {cards.map(({ Icon, label, value, gradient, iconColor }) => (
-        <div key={label} className="glass-card rounded-2xl p-5 flex items-center gap-4">
+        <div
+          key={label}
+          className="glass-card rounded-[var(--radius-card)] p-5 flex items-center gap-4"
+        >
           <div
             className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}
           >

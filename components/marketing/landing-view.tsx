@@ -52,17 +52,17 @@ export function LandingView({ user }: Props) {
         {/* Gradient orbs */}
         <div
           className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full
-                     bg-[radial-gradient(circle,rgba(108,92,231,0.15),transparent_65%)]
+                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent)_16%,transparent),transparent_65%)]
                      animate-float-slow pointer-events-none"
         />
         <div
           className="absolute top-20 -right-32 w-[500px] h-[500px] rounded-full
-                     bg-[radial-gradient(circle,rgba(139,124,246,0.12),transparent_65%)]
+                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent-light)_12%,transparent),transparent_65%)]
                      animate-float-slower pointer-events-none"
         />
         <div
           className="absolute bottom-0 left-1/3 w-[400px] h-[400px] rounded-full
-                     bg-[radial-gradient(circle,rgba(108,92,231,0.08),transparent_60%)]
+                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent)_9%,transparent),transparent_60%)]
                      animate-float-slow pointer-events-none"
         />
 
@@ -81,7 +81,7 @@ export function LandingView({ user }: Props) {
             >
               Menos planilha.
               <br />
-              <span className="bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-light)] bg-clip-text text-transparent">
                 Mais ritmo.
               </span>
             </h1>
@@ -117,7 +117,7 @@ export function LandingView({ user }: Props) {
           {/* Stats */}
           <div className="mt-20 flex justify-center">
             <div
-              className="glass-card rounded-2xl px-8 py-5 grid grid-cols-3 divide-x
+              className="glass-card rounded-[var(--radius-card)] px-8 py-5 grid grid-cols-3 divide-x
                          divide-[var(--color-border)] w-full max-w-md"
             >
               {STATS.map(({ value, label }) => (
@@ -147,7 +147,10 @@ export function LandingView({ user }: Props) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {FEATURES.map(({ title, body, Icon, gradient, iconColor }) => (
-              <div key={title} className="glass-card rounded-2xl p-6 flex flex-col gap-4">
+              <div
+                key={title}
+                className="glass-card rounded-[var(--radius-card)] p-6 flex flex-col gap-4"
+              >
                 <div
                   className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient}
                               flex items-center justify-center`}
@@ -169,7 +172,7 @@ export function LandingView({ user }: Props) {
         <section className="relative mx-auto max-w-6xl px-5 sm:px-8 pb-24">
           <div
             className="rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden
-                       bg-gradient-to-br from-[#6c5ce7] to-[#8b7cf6]"
+                       bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-light)]"
           >
             <div
               className="absolute -top-20 -right-20 w-72 h-72 rounded-full
@@ -190,7 +193,7 @@ export function LandingView({ user }: Props) {
               <Link
                 href="/login"
                 className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold
-                           text-[#6c5ce7] bg-white shadow-lg
+                           text-[var(--color-accent)] bg-white shadow-lg
                            hover:shadow-xl hover:translate-y-[-1px]
                            transition-all duration-200"
               >

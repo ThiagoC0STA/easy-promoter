@@ -59,12 +59,12 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
   }
 
   return (
-    <div className="glass-card rounded-2xl p-7 sm:p-9 w-full max-w-[420px] mx-auto">
+    <div className="glass-card rounded-[var(--radius-card)] p-7 sm:p-9 w-full max-w-[420px] mx-auto">
       <div className="mb-7">
         <div className="flex items-center gap-3 mb-3">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-[#6c5ce7]/20 to-[#8b7cf6]/20"
+                        bg-gradient-to-br from-[color-mix(in_srgb,var(--color-accent)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_18%,transparent)]"
           >
             <Lock size={20} strokeWidth={1.5} className="text-[var(--color-accent)]" />
           </div>

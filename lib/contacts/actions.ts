@@ -11,6 +11,26 @@ import {
 } from "./queries";
 import type { ContactInsert, ContactUpdate } from "./types";
 
+function userFacingContactSaveError(error: unknown): string {
+  if (error instanceof Error && error.message === "missing id") {
+    return "Não foi possível identificar o contato. Volte à lista e tente de novo.";
+  }
+  if (error && typeof error === "object" && "code" in error) {
+    const code = String((error as { code?: string }).code);
+    if (code === "23505") {
+      return "Este registro conflita com outro já salvo. Revise os dados e tente de novo.";
+    }
+    if (code === "PGRST116") {
+      return "Contato não encontrado ou você não tem permissão para esta ação.";
+    }
+  }
+  return "Não foi possível concluir a ação. Verifique a conexão e tente de novo.";
+}
+
+function redirectWithContactError(path: string, error: unknown): never {
+  redirect(`${path}?error=${encodeURIComponent(userFacingContactSaveError(error))}`);
+}
+
 function parseFormGenres(formData: FormData): string[] {
   const raw = formData.get("genres");
   if (!raw || typeof raw !== "string") return [];
@@ -56,7 +76,11 @@ export async function createContactAction(formData: FormData) {
   if (!user) redirect("/login");
 
   const payload = buildPayload(formData);
-  await createContact({ ...payload, owner_id: user.id });
+  try {
+    await createContact({ ...payload, owner_id: user.id });
+  } catch (e) {
+    redirectWithContactError("/app/contacts/new", e);
+  }
 
   revalidatePath("/app");
   revalidatePath("/app/contacts");
@@ -67,11 +91,18 @@ export async function updateContactAction(formData: FormData) {
   const { user } = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const id = formData.get("id");
-  if (!id || typeof id !== "string") throw new Error("Missing contact id");
+  const idRaw = formData.get("id");
+  if (typeof idRaw !== "string" || !idRaw) {
+    redirectWithContactError("/app/contacts", new Error("missing id"));
+  }
+  const id = idRaw;
 
   const payload: ContactUpdate = buildPayload(formData);
-  await updateContact(id, payload);
+  try {
+    await updateContact(id, payload);
+  } catch (e) {
+    redirectWithContactError(`/app/contacts/${id}/edit`, e);
+  }
 
   revalidatePath("/app");
   revalidatePath("/app/contacts");
@@ -82,33 +113,42 @@ export async function deleteContactAction(formData: FormData) {
   const { user } = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const id = formData.get("id");
-  if (!id || typeof id !== "string") throw new Error("Missing contact id");
+  const idRaw = formData.get("id");
+  if (typeof idRaw !== "string" || !idRaw) {
+    redirectWithContactError("/app/contacts", new Error("missing id"));
+  }
+  const id = idRaw;
 
-  await deleteContact(id);
+  try {
+    await deleteContact(id);
+  } catch (e) {
+    redirectWithContactError(`/app/contacts/${id}/edit`, e);
+  }
 
   revalidatePath("/app");
   revalidatePath("/app/contacts");
   redirect("/app/contacts");
 }
 
-export async function touchContactAction(formData: FormData) {
+export type TouchContactResult =
+  | { ok: true }
+  | { ok: false; message: string };
+
+export async function touchContactByIdAction(
+  contactId: string,
+): Promise<TouchContactResult> {
   const { user } = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    return { ok: false, message: "Sessão expirada. Entre de novo." };
+  }
 
-  const id = formData.get("id");
-  if (!id || typeof id !== "string") throw new Error("Missing contact id");
+  try {
+    await touchContact(contactId);
+  } catch (e) {
+    return { ok: false, message: userFacingContactSaveError(e) };
+  }
 
-  await touchContact(id);
   revalidatePath("/app");
   revalidatePath("/app/contacts");
-}
-
-export async function touchContactByIdAction(contactId: string) {
-  const { user } = await getCurrentUser();
-  if (!user) redirect("/login");
-
-  await touchContact(contactId);
-  revalidatePath("/app");
-  revalidatePath("/app/contacts");
+  return { ok: true };
 }

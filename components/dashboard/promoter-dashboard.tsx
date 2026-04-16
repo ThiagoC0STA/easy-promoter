@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Cake,
-  LayoutDashboard,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Cake, LayoutDashboard, Users } from "lucide-react";
 import type { Contact } from "@/lib/contacts/types";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { StatsCards } from "@/components/contacts/stats-cards";
@@ -18,7 +12,6 @@ import {
 
 type Props = {
   contacts: Contact[];
-  userEmail: string | null;
 };
 
 function needsAttention(contact: Contact): boolean {
@@ -26,9 +19,11 @@ function needsAttention(contact: Contact): boolean {
   return days === null || days >= COOLDOWN_DAYS;
 }
 
-export function PromoterDashboard({ contacts, userEmail }: Props) {
-  const priority = [...contacts]
-    .filter(needsAttention)
+export function PromoterDashboard({ contacts }: Props) {
+  const priorityAll = contacts.filter(needsAttention);
+  const priorityCount = priorityAll.length;
+
+  const priority = [...priorityAll]
     .sort((a, b) => {
       const da = daysSinceContact(a.last_contacted_at);
       const db = daysSinceContact(b.last_contacted_at);
@@ -50,14 +45,10 @@ export function PromoterDashboard({ contacts, userEmail }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
-      <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[#6c5ce7]/12 via-transparent to-[#8b7cf6]/10 p-6 sm:p-10 mb-10">
-        <div
-          className="absolute -right-20 -top-20 w-64 h-64 rounded-full opacity-40 pointer-events-none
-                     bg-[radial-gradient(circle,rgba(108,92,231,0.35),transparent_70%)]"
-        />
-        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+      <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-6 sm:p-10 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--color-surface-elevated)] border border-[var(--color-border)] shadow-sm">
+            <div className="w-12 h-12 rounded-[var(--radius-card)] flex items-center justify-center bg-[var(--color-surface-elevated)] border border-[var(--color-border)] shadow-sm">
               <LayoutDashboard
                 size={24}
                 strokeWidth={1.5}
@@ -65,17 +56,28 @@ export function PromoterDashboard({ contacts, userEmail }: Props) {
               />
             </div>
             <div>
-              <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)] mb-2">
-                <Sparkles size={12} strokeWidth={2} />
+              <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">
                 Visão geral
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-primary)] tracking-tight">
                 Dashboard
               </h1>
               <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-xl">
-                Gráficos da base, ritmo de contato e atalhos. A lista completa fica em Contatos.
+                Gráficos da base, ritmo de contato e atalhos. A lista completa fica em
+                Contatos.
               </p>
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-3">{userEmail}</p>
+              {priorityCount > 0 ? (
+                <p className="text-sm font-medium text-[var(--color-accent)] mt-3 max-w-xl">
+                  Há {priorityCount} contato{priorityCount === 1 ? "" : "s"} que{" "}
+                  {priorityCount === 1 ? "precisa" : "precisam"} de retomada. Veja a
+                  prioridade abaixo ou abra todos em Contatos.
+                </p>
+              ) : contacts.length > 0 ? (
+                <p className="text-sm text-[var(--color-text-tertiary)] mt-3 max-w-xl">
+                  Ninguém fora do ritmo ideal neste recorte. Bom momento para planejar
+                  próximos contatos.
+                </p>
+              ) : null}
             </div>
           </div>
           <Link

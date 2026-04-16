@@ -16,34 +16,55 @@ export function InviteForm() {
     setMessage(null);
     setError(null);
 
-    const res = await fetch("/api/admin/invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.trim(),
-        role: asSuperAdmin ? "super_admin" : "promoter",
-      }),
-    });
+    try {
+      const res = await fetch("/api/admin/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          role: asSuperAdmin ? "super_admin" : "promoter",
+        }),
+      });
 
-    const payload = (await res.json()) as { ok?: boolean; error?: string };
+      let payload: { ok?: boolean; error?: string } = {};
+      try {
+        payload = (await res.json()) as { ok?: boolean; error?: string };
+      } catch {
+        setError(
+          "Resposta inválida do servidor. Atualize a página e tente de novo.",
+        );
+        return;
+      }
 
-    setBusy(false);
+      if (!res.ok || !payload.ok) {
+        setError(
+          payload.error ??
+            "Não foi possível enviar o convite. Tente de novo em instantes.",
+        );
+        return;
+      }
 
-    if (!res.ok || !payload.ok) {
-      setError(payload.error ?? "Não foi possível enviar o convite.");
-      return;
+      setMessage(
+        "Convite enviado. A pessoa deve abrir o e-mail para concluir o acesso.",
+      );
+      setEmail("");
+      setAsSuperAdmin(false);
+    } catch {
+      setError(
+        "Sem conexão ou servidor indisponível. Verifique a internet e tente de novo.",
+      );
+    } finally {
+      setBusy(false);
     }
-
-    setMessage(
-      "Convite enviado. A pessoa deve abrir o e-mail para concluir o acesso.",
-    );
-    setEmail("");
-    setAsSuperAdmin(false);
   }
 
   return (
-    <div className="glass-card rounded-2xl p-7 sm:p-9">
-      <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    <div className="glass-card rounded-[var(--radius-card)] p-7 sm:p-9">
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-5"
+        aria-busy={busy}
+      >
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-[var(--color-text-primary)]">
             E-mail do convidado
@@ -60,8 +81,8 @@ export function InviteForm() {
               value={email}
               onChange={(ev) => setEmail(ev.target.value)}
               placeholder="promoter@exemplo.com"
-              autoComplete="off"
-              className="input-field input-with-icon"
+              autoComplete="email"
+              className="input-field input-with-icon min-h-11"
             />
           </div>
         </label>
@@ -80,18 +101,25 @@ export function InviteForm() {
           </span>
         </label>
 
-        {error && (
-          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-error)_25%,transparent)]">
-            <AlertCircle size={18} strokeWidth={1.5} className="text-[var(--color-error)] mt-0.5 shrink-0" />
-            <span className="text-sm text-[var(--color-error)]">{error}</span>
-          </div>
-        )}
-        {message && (
-          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-success)_25%,transparent)]">
-            <CheckCircle2 size={18} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" />
-            <span className="text-sm text-[var(--color-success)]">{message}</span>
-          </div>
-        )}
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="min-h-0 empty:hidden"
+        >
+          {error ? (
+            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-error)_25%,transparent)]">
+              <AlertCircle size={18} strokeWidth={1.5} className="text-[var(--color-error)] mt-0.5 shrink-0" aria-hidden />
+              <span className="text-sm text-[var(--color-error)]">{error}</span>
+            </div>
+          ) : null}
+          {message ? (
+            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-success)_25%,transparent)]">
+              <CheckCircle2 size={18} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" aria-hidden />
+              <span className="text-sm text-[var(--color-success)]">{message}</span>
+            </div>
+          ) : null}
+        </div>
 
         <button
           type="submit"

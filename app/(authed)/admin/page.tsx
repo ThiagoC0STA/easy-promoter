@@ -9,7 +9,9 @@ export default async function AdminHomePage() {
   return (
     <div className="mx-auto max-w-2xl px-5 sm:px-8 py-10 sm:py-14">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#6c5ce7]/20 to-[#8b7cf6]/20">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[color-mix(in_srgb,var(--color-accent)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_18%,transparent)]"
+        >
           <Shield size={20} strokeWidth={1.5} className="text-[var(--color-accent)]" />
         </div>
         <div>

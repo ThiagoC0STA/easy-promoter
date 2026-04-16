@@ -6,7 +6,5 @@ export default async function PromoterDashboardPage() {
   const { user } = await getCurrentUser();
   const contacts = user ? await getContacts() : [];
 
-  return (
-    <PromoterDashboard contacts={contacts} userEmail={user?.email ?? null} />
-  );
+  return <PromoterDashboard contacts={contacts} />;
 }

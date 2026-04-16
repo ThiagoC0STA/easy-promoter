@@ -31,6 +31,20 @@ export function DashboardCharts({ contacts }: Props) {
   const ig = contactsWithInstagram(contacts);
   const total = contacts.length;
 
+  const intro =
+    total === 0 ? (
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-2xl">
+        Cadastre contatos para encher os gráficos com ritmo de contato, segmentos e
+        canais.
+      </p>
+    ) : (
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-2xl">
+        Panorama da base com{" "}
+        <span className="font-semibold text-[var(--color-text-primary)]">{total}</span>{" "}
+        contato{total === 1 ? "" : "s"}.
+      </p>
+    );
+
   const recencyRows = [
     { label: "Sem registro", value: recency.never, color: "#64748b" },
     { label: "0–4 dias (quente)", value: recency["0_4"], color: "#ef4444" },
@@ -50,6 +64,7 @@ export function DashboardCharts({ contacts }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
+      {intro}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:items-stretch">
         <ChartPanel
           title="Ritmo de contato"
@@ -108,7 +123,7 @@ export function DashboardCharts({ contacts }: Props) {
           label="Canais completos"
           value={contacts.filter((c) => c.whatsapp?.trim() && c.instagram?.trim()).length}
           total={total}
-          accent="from-[#6c5ce7]/25 to-[#8b7cf6]/15"
+          accent="from-[color-mix(in_srgb,var(--color-accent)_25%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_15%,transparent)]"
         />
       </div>
     </div>
@@ -129,7 +144,7 @@ function MiniStat({
   const pct = total === 0 ? 0 : Math.round((value / total) * 100);
   return (
     <div
-      className={`dash-chart-card rounded-2xl p-5 flex flex-col justify-between min-h-[132px] bg-gradient-to-br ${accent}`}
+      className={`dash-chart-card rounded-[var(--radius-card)] p-5 flex flex-col justify-between min-h-[132px] bg-gradient-to-br ${accent}`}
     >
       <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider">
         {label}

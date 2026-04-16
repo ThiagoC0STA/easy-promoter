@@ -11,7 +11,7 @@ type Props = {
  */
 export function ChartPanel({ title, subtitle, children }: Props) {
   return (
-    <article className="dash-chart-card rounded-2xl p-5 sm:p-6 flex flex-col h-full min-h-[300px] lg:min-h-[320px]">
+    <article className="dash-chart-card rounded-[var(--radius-card)] p-5 sm:p-6 flex flex-col h-full min-h-[300px] lg:min-h-[320px]">
       <header className="shrink-0 mb-4 pb-4 border-b border-[var(--color-border-subtle)]">
         <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
           {title}

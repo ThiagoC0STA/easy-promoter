@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { ProfileRole } from "@/lib/auth/types";
+import { mapInviteUserErrorMessage } from "@/lib/admin/invite-user-messages";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { getAppOrigin } from "@/lib/env/site-url";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/admin";
@@ -16,23 +17,39 @@ function isValidEmail(email: string): boolean {
 export async function POST(request: Request) {
   const profile = await getCurrentProfile();
   if (!profile) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { ok: false, error: "Faça login para enviar convites." },
+      { status: 401 },
+    );
   }
   if (profile.role !== "super_admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, error: "Somente super admins podem enviar convites." },
+      { status: 403 },
+    );
   }
 
   let body: InviteBody;
   try {
     body = (await request.json()) as InviteBody;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "Dados inválidos na requisição. Atualize a página e tente de novo.",
+      },
+      { status: 400 },
+    );
   }
 
   const email =
     typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!isValidEmail(email)) {
-    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Informe um endereço de e-mail válido." },
+      { status: 400 },
+    );
   }
 
   let invitedRole: ProfileRole = "promoter";
@@ -51,7 +68,10 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: mapInviteUserErrorMessage(error.message) },
+      { status: 400 },
+    );
   }
 
   return NextResponse.json({

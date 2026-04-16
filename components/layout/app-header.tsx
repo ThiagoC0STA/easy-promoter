@@ -67,9 +67,9 @@ export function AppHeader() {
             >
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center
-                            bg-gradient-to-br from-[#6c5ce7] to-[#8b7cf6]
-                            shadow-[0_2px_8px_-2px_rgba(108,92,231,0.4)]
-                            group-hover:shadow-[0_2px_12px_-2px_rgba(108,92,231,0.55)]
+                            bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-light)]
+                            shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--color-accent)_40%,transparent)]
+                            group-hover:shadow-[0_2px_12px_-2px_color-mix(in_srgb,var(--color-accent)_52%,transparent)]
                             transition-shadow duration-200"
               >
                 <span className="text-white text-sm font-bold leading-none">
