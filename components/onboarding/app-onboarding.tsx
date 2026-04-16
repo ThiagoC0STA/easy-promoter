@@ -66,7 +66,7 @@ export function AppOnboarding() {
       aria-modal="true"
       aria-labelledby="onboarding-title"
     >
-      <div className="absolute inset-0 bg-[color-mix(in_srgb,var(--color-text-primary)_55%,transparent)]" />
+      <div className="absolute inset-0 bg-[#00000033]" />
       <div
         className="relative w-full max-w-md rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-xl p-6 sm:p-8"
       >

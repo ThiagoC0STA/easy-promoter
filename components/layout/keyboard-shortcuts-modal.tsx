@@ -47,7 +47,7 @@ export function KeyboardShortcutsModal({ open, onClose }: Props) {
     >
       <button
         type="button"
-        className="absolute inset-0 bg-[color-mix(in_srgb,var(--color-text-primary)_55%,transparent)] cursor-default"
+        className="absolute inset-0 bg-[#00000033] cursor-default"
         aria-label="Fechar"
         onClick={onClose}
       />
