@@ -10,13 +10,27 @@ export type ContactFilters = {
 };
 
 const CONTACT_COLUMNS =
-  "id, owner_id, name, whatsapp, instagram, birthday, genres, segments, frequency, spending, post_type, reach, confirmed, responded, last_contacted_at, notes, created_at, updated_at";
+  "id, owner_id, name, whatsapp, instagram, birthday, genres, segments, frequency, spending, post_type, reach, confirmed, responded, last_contacted_at, notes, group_id, created_at, updated_at";
+
+export type GetContactsOptions = ContactFilters & {
+  /** null = show contacts with no group (default "Geral" tab) */
+  groupId?: string | null;
+};
 
 export async function getContacts(
-  filters: ContactFilters = {},
+  filters: GetContactsOptions = {},
 ): Promise<Contact[]> {
   const supabase = await createServerSupabaseClient();
   let query = supabase.from("contacts").select(CONTACT_COLUMNS);
+
+  // Filter by group: undefined = all contacts (admin view), null = ungrouped, string = specific group
+  if (filters.groupId !== undefined) {
+    if (filters.groupId === null) {
+      query = query.is("group_id", null);
+    } else {
+      query = query.eq("group_id", filters.groupId);
+    }
+  }
 
   if (filters.search?.trim()) {
     query = query.ilike("name", `%${filters.search.trim()}%`);

@@ -74,7 +74,7 @@ export function DayQueueSection({ contacts }: Props) {
             return (
               <li key={c.id}>
                 <Link
-                  href={`/app/contacts/${c.id}/edit`}
+                  href={`/app/contacts?edit=${c.id}`}
                   className="glass-card rounded-[var(--radius-control)] px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-[var(--color-accent)] transition-colors"
                 >
                   <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">

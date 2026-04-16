@@ -1,62 +1,61 @@
 import Link from "next/link";
-import { Activity, ScrollText, Shield, Users } from "lucide-react";
+import { Activity, ScrollText } from "lucide-react";
 import { InviteForm } from "@/components/admin/invite-form";
 import { PromotersList } from "@/components/admin/promoters-list";
-import { getPromoters } from "@/lib/admin/queries";
+import { PromoterStatsTable } from "@/components/admin/promoter-stats-table";
+import { getPromoters, getPromoterStats } from "@/lib/admin/queries";
 
 export default async function AdminHomePage() {
-  const promoters = await getPromoters();
+  const [promoters, stats] = await Promise.all([getPromoters(), getPromoterStats()]);
 
   return (
-    <div className="mx-auto max-w-2xl px-5 sm:px-8 py-10 sm:py-14">
-      <div className="flex items-center gap-3 mb-8">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[color-mix(in_srgb,var(--color-accent)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_18%,transparent)]"
-        >
-          <Shield size={20} strokeWidth={1.5} className="text-[var(--color-accent)]" />
-        </div>
+    <div className="mx-auto max-w-3xl px-5 sm:px-8 py-8 sm:py-10">
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+          <h1 className="text-2xl sm:text-[28px] font-semibold tracking-tight text-[var(--color-text-primary)]">
             Super admin
           </h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
             Convites e visão geral dos promoters
           </p>
         </div>
-      </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Link
+            href="/admin/changelog"
+            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-tertiary)] transition-colors"
+          >
+            <ScrollText size={14} strokeWidth={1.75} aria-hidden />
+            Changelog
+          </Link>
+          <Link
+            href="/admin/health"
+            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-tertiary)] transition-colors"
+          >
+            <Activity size={14} strokeWidth={1.75} aria-hidden />
+            Saúde
+          </Link>
+        </div>
+      </header>
 
-      <div className="flex flex-wrap gap-3 mb-8 text-sm">
-        <Link
-          href="/admin/changelog"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
-        >
-          <ScrollText size={16} strokeWidth={1.5} aria-hidden />
-          Changelog
-        </Link>
-        <Link
-          href="/admin/health"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
-        >
-          <Activity size={16} strokeWidth={1.5} aria-hidden />
-          Saúde do app
-        </Link>
-      </div>
-
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-8">
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
             Enviar convite
           </h2>
           <InviteForm />
         </section>
 
         <section>
-          <div className="flex items-center gap-2 mb-4">
-            <Users size={16} strokeWidth={1.5} className="text-[var(--color-text-tertiary)]" />
-            <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
-              Promoters ({promoters.length})
-            </h2>
-          </div>
+          <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
+            Dashboard de performance
+          </h2>
+          <PromoterStatsTable stats={stats} />
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
+            Promoters <span className="text-[var(--color-text-tertiary)] font-normal">· {promoters.length}</span>
+          </h2>
           <PromotersList promoters={promoters} />
         </section>
       </div>

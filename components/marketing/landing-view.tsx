@@ -5,7 +5,6 @@ import {
   Clock,
   Music2,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { AppHeader } from "@/components/layout/app-header";
 
@@ -14,29 +13,17 @@ const FEATURES = [
     title: "Cooldown inteligente",
     body: "Veja quando cada pessoa foi contatada e evite chamar de novo cedo demais.",
     Icon: Clock,
-    gradient: "from-violet-500/20 to-blue-500/20",
-    iconColor: "text-violet-500",
   },
   {
     title: "Perfil musical completo",
     body: "Gêneros, aniversário, Instagram e WhatsApp reunidos no mesmo lugar.",
     Icon: Music2,
-    gradient: "from-pink-500/20 to-orange-500/20",
-    iconColor: "text-pink-500",
   },
   {
     title: "Acesso controlado",
     body: "Sem signup público. Só entra quem o super admin convidar por e-mail.",
     Icon: ShieldCheck,
-    gradient: "from-emerald-500/20 to-cyan-500/20",
-    iconColor: "text-emerald-500",
   },
-] as const;
-
-const STATS = [
-  { value: "0s", label: "Tempo de setup" },
-  { value: "100%", label: "Sem planilha" },
-  { value: "24/7", label: "Disponível" },
 ] as const;
 
 type Props = {
@@ -48,63 +35,41 @@ export function LandingView({ user }: Props) {
     <div className="min-h-screen flex flex-col bg-[var(--color-surface)]">
       <AppHeader />
 
-      <main className="flex-1 relative overflow-hidden">
-        {/* Gradient orbs */}
-        <div
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full
-                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent)_16%,transparent),transparent_65%)]
-                     animate-float-slow pointer-events-none"
-        />
-        <div
-          className="absolute top-20 -right-32 w-[500px] h-[500px] rounded-full
-                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent-light)_12%,transparent),transparent_65%)]
-                     animate-float-slower pointer-events-none"
-        />
-        <div
-          className="absolute bottom-0 left-1/3 w-[400px] h-[400px] rounded-full
-                     bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent)_9%,transparent),transparent_60%)]
-                     animate-float-slow pointer-events-none"
-        />
-
+      <main className="flex-1">
         {/* Hero */}
-        <section className="relative mx-auto max-w-6xl px-5 sm:px-8 pt-16 sm:pt-24 pb-20">
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <div className="badge-accent animate-fade-in-up mb-6">
-              <Sparkles size={14} strokeWidth={2} aria-hidden />
+        <section className="mx-auto max-w-5xl px-5 sm:px-8 pt-20 sm:pt-28 pb-20">
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] mb-6">
               CRM para promoters
-            </div>
+            </span>
 
             <h1
-              className="text-[2.75rem] sm:text-6xl md:text-7xl font-extrabold tracking-tight
-                         leading-[1.05] text-[var(--color-text-primary)]
-                         animate-fade-in-up-delay-1"
+              className="text-[2.5rem] sm:text-[3.5rem] md:text-[4rem] font-semibold tracking-tight
+                         leading-[1.05] text-[var(--color-text-primary)]"
             >
               Menos planilha.
               <br />
-              <span className="bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-light)] bg-clip-text text-transparent">
+              <span className="text-[var(--color-accent)]">
                 Mais ritmo.
               </span>
             </h1>
 
-            <p
-              className="mt-6 text-lg sm:text-xl text-[var(--color-text-secondary)]
-                         max-w-xl leading-relaxed animate-fade-in-up-delay-2"
-            >
+            <p className="mt-5 text-base sm:text-lg text-[var(--color-text-secondary)] max-w-xl leading-relaxed">
               Organize contatos, respeite intervalos entre abordagens e saiba
               quem curte cada som antes de chamar pro rolê.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up-delay-3">
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
               {user ? (
                 <Link href="/app" className="btn-primary">
                   Abrir plataforma
-                  <ArrowRight size={18} strokeWidth={1.75} />
+                  <ArrowRight size={15} strokeWidth={1.75} />
                 </Link>
               ) : (
                 <>
                   <Link href="/login" className="btn-primary">
                     Começar agora
-                    <ArrowRight size={18} strokeWidth={1.75} />
+                    <ArrowRight size={15} strokeWidth={1.75} />
                   </Link>
                   <Link href="/login" className="btn-secondary">
                     Já tenho acesso
@@ -113,54 +78,32 @@ export function LandingView({ user }: Props) {
               )}
             </div>
           </div>
-
-          {/* Stats */}
-          <div className="mt-20 flex justify-center">
-            <div
-              className="glass-card rounded-[var(--radius-card)] px-8 py-5 grid grid-cols-3 divide-x
-                         divide-[var(--color-border)] w-full max-w-md"
-            >
-              {STATS.map(({ value, label }) => (
-                <div key={label} className="flex flex-col items-center px-4">
-                  <span className="text-2xl font-bold text-[var(--color-text-primary)]">
-                    {value}
-                  </span>
-                  <span className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
-                    {label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* Features */}
-        <section className="relative mx-auto max-w-6xl px-5 sm:px-8 pb-24">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)] mb-3">
-              Funcionalidades
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-text-primary)]">
+        <section className="mx-auto max-w-5xl px-5 sm:px-8 pb-20">
+          <div className="mb-10 max-w-xl">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--color-text-primary)]">
               Tudo que um promoter precisa
             </h2>
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-2">
+              Ferramentas simples pra substituir a planilha e ganhar ritmo.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {FEATURES.map(({ title, body, Icon, gradient, iconColor }) => (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {FEATURES.map(({ title, body, Icon }) => (
               <div
                 key={title}
-                className="glass-card rounded-[var(--radius-card)] p-6 flex flex-col gap-4"
+                className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 flex flex-col gap-3"
               >
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient}
-                              flex items-center justify-center`}
-                >
-                  <Icon size={22} strokeWidth={1.5} className={iconColor} />
+                <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-[var(--color-accent-muted)] text-[var(--color-accent)]">
+                  <Icon size={16} strokeWidth={1.75} />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                <h3 className="text-[15px] font-semibold text-[var(--color-text-primary)]">
                   {title}
                 </h3>
-                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                <p className="text-sm text-[var(--color-text-tertiary)] leading-relaxed">
                   {body}
                 </p>
               </div>
@@ -169,66 +112,40 @@ export function LandingView({ user }: Props) {
         </section>
 
         {/* CTA */}
-        <section className="relative mx-auto max-w-6xl px-5 sm:px-8 pb-24">
-          <div
-            className="rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden
-                       bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-light)]"
-          >
-            <div
-              className="absolute -top-20 -right-20 w-72 h-72 rounded-full
-                         bg-white/10 blur-3xl pointer-events-none"
-            />
-            <div
-              className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full
-                         bg-white/10 blur-3xl pointer-events-none"
-            />
-            <div className="relative">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                Pronto pra organizar sua lista?
-              </h2>
-              <p className="text-white/80 mb-8 max-w-md mx-auto">
-                Peça seu convite ao admin e comece a usar agora. Zero setup, zero
-                planilha.
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold
-                           text-[var(--color-accent)] bg-white shadow-lg
-                           hover:shadow-xl hover:translate-y-[-1px]
-                           transition-all duration-200"
-              >
-                Acessar plataforma
-                <ArrowRight size={18} strokeWidth={1.75} />
-              </Link>
-            </div>
+        <section className="mx-auto max-w-5xl px-5 sm:px-8 pb-24">
+          <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-6 py-10 sm:px-10 sm:py-12 text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-2">
+              Pronto pra organizar sua lista?
+            </h2>
+            <p className="text-sm text-[var(--color-text-tertiary)] mb-6 max-w-md mx-auto">
+              Peça seu convite ao admin e comece a usar agora. Zero setup.
+            </p>
+            <Link href="/login" className="btn-primary">
+              Acessar plataforma
+              <ArrowRight size={15} strokeWidth={1.75} />
+            </Link>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--color-border)] bg-[var(--color-surface-secondary)]">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-6 flex flex-col gap-4">
-          <div className="flex flex-wrap justify-center sm:justify-end gap-x-5 gap-y-2 text-xs">
+      <footer className="border-t border-[var(--color-border)]">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-xs text-[var(--color-text-tertiary)]">
+            © {new Date().getFullYear()} Easy Promoter
+          </span>
+          <div className="flex gap-5 text-xs">
             <Link
               href="/privacidade"
-              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors"
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
             >
               Privacidade
             </Link>
             <Link
               href="/termos"
-              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors"
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
             >
               Termos
             </Link>
-          </div>
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
-            <span className="text-xs text-[var(--color-text-tertiary)]">
-              © {new Date().getFullYear()} Easy Promoter
-            </span>
-            <span className="text-xs text-[var(--color-text-tertiary)]">
-              Feito para promoters e casas noturnas
-            </span>
           </div>
         </div>
       </footer>

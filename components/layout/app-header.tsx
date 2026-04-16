@@ -80,11 +80,8 @@ export function AppHeader() {
               className="flex items-center gap-2.5 no-underline group"
             >
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                            bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-light)]
-                            shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--color-accent)_40%,transparent)]
-                            group-hover:shadow-[0_2px_12px_-2px_color-mix(in_srgb,var(--color-accent)_52%,transparent)]
-                            transition-shadow duration-200"
+                className="w-7 h-7 rounded-md flex items-center justify-center
+                            bg-[var(--color-accent)]"
               >
                 <span className="text-white text-sm font-bold leading-none">
                   E
@@ -207,11 +204,11 @@ function NavLink({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium no-underline transition-all duration-200
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium no-underline transition-colors
         ${
           active
-            ? "text-[var(--color-accent)] bg-[var(--color-accent-muted)] border border-[color-mix(in_srgb,var(--color-accent)_28%,transparent)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-            : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-muted)] border border-transparent"
+            ? "text-[var(--color-text-primary)] bg-[var(--color-surface-secondary)]"
+            : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]"
         }`}
     >
       {icon}
@@ -233,11 +230,11 @@ function MobileNavLink({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`flex-1 min-w-[100px] text-center py-2.5 rounded-xl text-sm font-semibold no-underline transition-all duration-200
+      className={`flex-1 min-w-[100px] text-center py-2 rounded-md text-sm font-medium no-underline transition-colors
         ${
           active
-            ? "text-[var(--color-accent)] bg-[var(--color-accent-muted)] border border-[color-mix(in_srgb,var(--color-accent)_28%,transparent)]"
-            : "text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] border border-transparent hover:bg-[var(--color-accent-muted)] hover:text-[var(--color-text-primary)]"
+            ? "text-[var(--color-text-primary)] bg-[var(--color-surface-secondary)]"
+            : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]"
         }`}
     >
       {children}

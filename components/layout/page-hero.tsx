@@ -3,7 +3,7 @@ import * as React from "react";
 type Size = "lg" | "md";
 
 type Props = {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   eyebrow?: string;
   title: string;
   description?: React.ReactNode;
@@ -13,20 +13,9 @@ type Props = {
   className?: string;
 };
 
-const sizeClasses: Record<
-  Size,
-  { root: string; title: string; iconWrap: string }
-> = {
-  lg: {
-    root: "p-6 sm:p-10 mb-10",
-    title: "text-3xl sm:text-4xl",
-    iconWrap: "w-12 h-12 rounded-[var(--radius-card)]",
-  },
-  md: {
-    root: "p-5 sm:p-8 mb-8",
-    title: "text-2xl sm:text-3xl",
-    iconWrap: "w-11 h-11 rounded-xl",
-  },
+const sizeClasses: Record<Size, { title: string; mb: string }> = {
+  lg: { title: "text-2xl sm:text-3xl", mb: "mb-8" },
+  md: { title: "text-xl sm:text-2xl", mb: "mb-6" },
 };
 
 export function PageHero({
@@ -42,45 +31,48 @@ export function PageHero({
   const s = sizeClasses[size];
 
   return (
-    <div className={`surface-hero ${s.root} ${className}`.trim()}>
-      <div
-        className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
-        aria-labelledby="page-hero-title"
-      >
-        <div className="flex items-start gap-4 min-w-0">
-          <div
-            className={`${s.iconWrap} flex items-center justify-center shrink-0
-                        bg-[var(--color-surface-secondary)] border border-[var(--color-border)]
-                        shadow-[var(--shadow-icon)]`}
-          >
-            {icon}
-          </div>
+    <header className={`${s.mb} ${className}`.trim()}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex items-start gap-3">
+          {icon ? (
+            <div
+              className="shrink-0 mt-0.5 h-8 w-8 rounded-lg flex items-center justify-center
+                         bg-[var(--color-surface-secondary)] border border-[var(--color-border)]
+                         text-[var(--color-accent)]"
+            >
+              {icon}
+            </div>
+          ) : null}
           <div className="min-w-0">
             {eyebrow ? (
-              <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-[var(--color-text-tertiary)] mb-1">
                 {eyebrow}
               </p>
             ) : null}
             <h1
               id="page-hero-title"
-              className={`${s.title} font-bold text-[var(--color-text-primary)] tracking-tight`}
+              className={`${s.title} font-semibold tracking-tight text-[var(--color-text-primary)]`}
             >
               {title}
             </h1>
             {description ? (
-              <div className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-xl leading-relaxed">
+              <div className="text-sm text-[var(--color-text-tertiary)] mt-1 max-w-2xl leading-relaxed">
                 {description}
               </div>
             ) : null}
-            {children ? <div className="mt-3 max-w-xl space-y-2">{children}</div> : null}
+            {children ? (
+              <div className="mt-3 max-w-2xl text-sm text-[var(--color-text-tertiary)]">
+                {children}
+              </div>
+            ) : null}
           </div>
         </div>
         {actions ? (
-          <div className="flex shrink-0 flex-wrap gap-3 self-start sm:self-auto">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:self-center">
             {actions}
           </div>
         ) : null}
       </div>
-    </div>
+    </header>
   );
 }
