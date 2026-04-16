@@ -16,7 +16,7 @@ export default async function LoginPage({
       ? decodeURIComponent(rawError)
       : null;
 
-  const emailRedirectUrl = `${getAppOrigin()}/auth/callback?next=/app`;
+  const resetRedirectUrl = `${getAppOrigin()}/auth/callback?next=/bem-vindo`;
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-surface)]">
@@ -26,7 +26,7 @@ export default async function LoginPage({
         <div className="w-full px-5 sm:px-8 py-12 sm:py-20">
           <LoginForm
             initialError={initialError}
-            emailRedirectUrl={emailRedirectUrl}
+            resetRedirectUrl={resetRedirectUrl}
           />
         </div>
       </main>

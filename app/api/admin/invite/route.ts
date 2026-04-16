@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   }
 
   const admin = createServiceRoleSupabaseClient();
-  const redirectTo = `${getAppOrigin()}/auth/callback?next=/app`;
+  const redirectTo = `${getAppOrigin()}/auth/callback?next=/bem-vindo`;
 
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo,

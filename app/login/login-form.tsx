@@ -8,97 +8,93 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type Props = {
   initialError?: string | null;
-  emailRedirectUrl: string;
+  resetRedirectUrl: string;
 };
 
-export function LoginForm({ initialError, emailRedirectUrl }: Props) {
+type Mode = "signin" | "forgot";
+
+export function LoginForm({ initialError, resetRedirectUrl }: Props) {
   const router = useRouter();
   const supabase = React.useMemo(() => createBrowserSupabaseClient(), []);
 
+  const [mode, setMode] = React.useState<Mode>("signin");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [usePassword, setUsePassword] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(
-    initialError ?? null,
-  );
-  const [linkSent, setLinkSent] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(initialError ?? null);
+  const [resetSent, setResetSent] = React.useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    setLinkSent(false);
+    setResetSent(false);
 
     const trimmed = email.trim();
 
-    if (usePassword) {
-      const { error: signError } = await supabase.auth.signInWithPassword({
-        email: trimmed,
-        password,
+    if (mode === "forgot") {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo: resetRedirectUrl,
       });
       setBusy(false);
-      if (signError) {
-        setError(signError.message);
+      if (resetError) {
+        setError(resetError.message);
         return;
       }
-      router.replace("/app");
-      router.refresh();
+      setResetSent(true);
       return;
     }
 
-    const { error: otpError } = await supabase.auth.signInWithOtp({
+    const { error: signError } = await supabase.auth.signInWithPassword({
       email: trimmed,
-      options: { emailRedirectTo: emailRedirectUrl },
+      password,
     });
     setBusy(false);
-    if (otpError) {
-      setError(otpError.message);
+    if (signError) {
+      setError("E-mail ou senha incorretos.");
       return;
     }
-    setLinkSent(true);
+    router.replace("/app");
+    router.refresh();
   }
+
+  const isForgot = mode === "forgot";
 
   return (
     <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-7 sm:p-8 w-full max-w-[400px] mx-auto shadow-[var(--shadow-sm)]">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">
-          Entrar
+          {isForgot ? "Recuperar senha" : "Entrar"}
         </h2>
         <p className="text-sm text-[var(--color-text-tertiary)] mt-1.5">
-          {usePassword
-            ? "Use seu e-mail e senha para acessar."
-            : "Informe seu e-mail e receba um link de acesso."}
+          {isForgot
+            ? "Informe seu e-mail e enviaremos um link para definir uma nova senha."
+            : "Use seu e-mail e senha para acessar o painel."}
         </p>
       </div>
 
-      {(error || initialError) && (
+      {error && (
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl mb-5 bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-error)_25%,transparent)]">
           <AlertCircle size={18} strokeWidth={1.5} className="text-[var(--color-error)] mt-0.5 shrink-0" />
-          <span className="text-sm text-[var(--color-error)]">{error ?? initialError}</span>
+          <span className="text-sm text-[var(--color-error)]">{error}</span>
         </div>
       )}
 
-      {linkSent && !usePassword && (
+      {resetSent && (
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl mb-5 bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-success)_25%,transparent)]">
           <CheckCircle2 size={18} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" />
           <span className="text-sm text-[var(--color-success)]">
-            Pronto. Abra o e-mail neste dispositivo e toque no link para entrar.
+            Se o e-mail existir na nossa base, você vai receber um link para criar uma nova senha.
           </span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">
-            E-mail
-          </span>
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">E-mail</span>
           <div className="relative">
-            <Mail
-              size={18}
-              strokeWidth={1.5}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] pointer-events-none"
-            />
+            <Mail size={18} strokeWidth={1.5}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] pointer-events-none" />
             <input
               type="email"
               autoComplete="email"
@@ -111,17 +107,21 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
           </div>
         </label>
 
-        {usePassword && (
+        {!isForgot && (
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-[var(--color-text-primary)]">
-              Senha
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-[var(--color-text-primary)]">Senha</span>
+              <button
+                type="button"
+                onClick={() => { setMode("forgot"); setError(null); setResetSent(false); }}
+                className="text-xs font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors cursor-pointer"
+              >
+                Esqueci a senha
+              </button>
+            </div>
             <div className="relative">
-              <Lock
-                size={18}
-                strokeWidth={1.5}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] pointer-events-none"
-              />
+              <Lock size={18} strokeWidth={1.5}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] pointer-events-none" />
               <input
                 type="password"
                 autoComplete="current-password"
@@ -134,7 +134,8 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
           </label>
         )}
 
-        <button type="submit" disabled={busy} className="btn-primary w-full !h-11 disabled:opacity-60 disabled:cursor-not-allowed">
+        <button type="submit" disabled={busy}
+          className="btn-primary w-full !h-11 disabled:opacity-60 disabled:cursor-not-allowed">
           {busy ? (
             <span className="flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -142,29 +143,24 @@ export function LoginForm({ initialError, emailRedirectUrl }: Props) {
             </span>
           ) : (
             <>
-              {usePassword ? "Entrar com senha" : "Continuar"}
+              {isForgot ? "Enviar link de recuperação" : "Entrar"}
               <ArrowRight size={18} strokeWidth={1.75} />
             </>
           )}
         </button>
       </form>
 
-      <div className="mt-6 pt-5 border-t border-[var(--color-border)] text-center">
-        <button
-          type="button"
-          onClick={() => {
-            setUsePassword((v) => !v);
-            setError(null);
-            setLinkSent(false);
-          }}
-          className="text-sm font-medium text-[var(--color-text-tertiary)]
-                     hover:text-[var(--color-accent)] transition-colors duration-200 cursor-pointer"
-        >
-          {usePassword
-            ? "Receber acesso por e-mail"
-            : "Entrar com e-mail e senha"}
-        </button>
-      </div>
+      {isForgot && (
+        <div className="mt-6 pt-5 border-t border-[var(--color-border)] text-center">
+          <button
+            type="button"
+            onClick={() => { setMode("signin"); setError(null); setResetSent(false); }}
+            className="text-sm font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors cursor-pointer"
+          >
+            Voltar para entrar
+          </button>
+        </div>
+      )}
 
       <p className="mt-6 text-center text-xs text-[var(--color-text-tertiary)] flex flex-wrap justify-center gap-x-4 gap-y-1">
         <Link href="/privacidade" className="hover:text-[var(--color-accent)] transition-colors">
