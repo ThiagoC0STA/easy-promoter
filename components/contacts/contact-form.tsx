@@ -27,6 +27,8 @@ import { ContactTouchHistoryPanel } from "@/components/contacts/contact-touch-hi
 type Props = {
   contact?: Contact;
   actionError?: string | null;
+  /** Full page (default) or compact body for slide-over panel */
+  layout?: "page" | "sheet";
 };
 
 function FieldHint({ children }: { children: React.ReactNode }) {
@@ -37,9 +39,14 @@ function FieldHint({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ContactForm({ contact, actionError }: Props) {
+export function ContactForm({
+  contact,
+  actionError,
+  layout = "page",
+}: Props) {
   const isEdit = Boolean(contact);
   const action = isEdit ? updateContactAction : createContactAction;
+  const isSheet = layout === "sheet";
 
   const [genres, setGenres] = React.useState<string[]>(
     contact?.genres ?? [],
@@ -52,26 +59,26 @@ export function ContactForm({ contact, actionError }: Props) {
     );
   }
 
-  return (
-    <div className="mx-auto max-w-2xl px-5 sm:px-8 py-10 sm:py-14">
-      <Link
-        href="/app/contacts"
-        className="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] mb-6 transition-colors rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
-      >
-        <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
-        Voltar para contatos
-      </Link>
+  const formInner = (
+    <>
+      {actionError ? (
+        <div className={isSheet ? "mb-4" : "mb-6"}>
+          <ActionErrorBanner message={actionError} />
+        </div>
+      ) : null}
 
-      {actionError ? <ActionErrorBanner message={actionError} /> : null}
-
-      <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
-        {isEdit ? "Editar contato" : "Novo contato"}
-      </h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-8">
-        {isEdit
-          ? "Altere os dados e salve. Excluir remove o contato para sempre."
-          : "Preencha o que souber. Você pode editar depois."}
-      </p>
+      {!isSheet ? (
+        <>
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
+            {isEdit ? "Editar contato" : "Novo contato"}
+          </h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-8">
+            {isEdit
+              ? "Altere os dados e salve. Excluir remove o contato para sempre."
+              : "Preencha o que souber. Você pode editar depois."}
+          </p>
+        </>
+      ) : null}
 
       <form action={action} className="flex flex-col gap-6">
         {isEdit && <input type="hidden" name="id" value={contact!.id} />}
@@ -346,6 +353,24 @@ export function ContactForm({ contact, actionError }: Props) {
           </div>
         </div>
       </form>
+    </>
+  );
+
+  if (isSheet) {
+    return <div className="min-w-0">{formInner}</div>;
+  }
+
+  return (
+    <div className="mx-auto max-w-2xl px-5 sm:px-8 py-10 sm:py-14">
+      <Link
+        href="/app/contacts"
+        className="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] mb-6 transition-colors rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+      >
+        <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
+        Voltar para contatos
+      </Link>
+
+      {formInner}
     </div>
   );
 }

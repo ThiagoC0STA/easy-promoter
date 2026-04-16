@@ -29,7 +29,10 @@ function userFacingContactSaveError(error: unknown): string {
 }
 
 function redirectWithContactError(path: string, error: unknown): never {
-  redirect(`${path}?error=${encodeURIComponent(userFacingContactSaveError(error))}`);
+  const separator = path.includes("?") ? "&" : "?";
+  redirect(
+    `${path}${separator}error=${encodeURIComponent(userFacingContactSaveError(error))}`,
+  );
 }
 
 function parseFormGenres(formData: FormData): string[] {
@@ -80,7 +83,7 @@ export async function createContactAction(formData: FormData) {
   try {
     await createContact({ ...payload, owner_id: user.id });
   } catch (e) {
-    redirectWithContactError("/app/contacts/new", e);
+    redirectWithContactError("/app/contacts?novo=1", e);
   }
 
   revalidatePath("/app");

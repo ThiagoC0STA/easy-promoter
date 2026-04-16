@@ -23,7 +23,7 @@ export default async function AdminAreaLayout({
         className="border-b border-[color-mix(in_srgb,var(--color-accent)_22%,var(--color-border))]
                    bg-[color-mix(in_srgb,var(--color-accent)_7%,var(--color-surface-secondary))]"
       >
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-2.5 flex items-start gap-2.5 text-xs font-medium text-[var(--color-text-secondary)]">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 py-2.5 flex items-start gap-2.5 text-xs font-medium text-[var(--color-text-secondary)]">
           <Shield
             className="shrink-0 text-[var(--color-accent)] mt-0.5"
             size={15}

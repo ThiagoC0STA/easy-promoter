@@ -61,15 +61,15 @@ export function ContactsTable({
   return (
     <div className="flex flex-col gap-5">
       <div
-        className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-4 sm:p-5
-                   flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+        className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 sm:p-5
+                   shadow-[var(--shadow-card)] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
       >
         <div className="flex-1 min-w-0">
           <FilterBar filters={filters} onChange={setFilters} />
         </div>
         {showAddButton && !readOnly && (
           <Link
-            href="/app/contacts/new"
+            href="/app/contacts?novo=1"
             className="btn-primary shrink-0 self-start sm:self-center"
           >
             <Plus size={18} strokeWidth={1.75} aria-hidden />
@@ -125,7 +125,7 @@ export function ContactsTable({
                 Comece cadastrando alguém da sua base. Você pode importar depois se precisar.
               </p>
               {!readOnly && (
-                <Link href="/app/contacts/new" className="btn-primary">
+                <Link href="/app/contacts?novo=1" className="btn-primary">
                   <Plus size={18} strokeWidth={1.75} aria-hidden />
                   Adicionar primeiro contato
                 </Link>

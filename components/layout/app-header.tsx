@@ -72,7 +72,7 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-[var(--color-border)]">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-6">
             <Link

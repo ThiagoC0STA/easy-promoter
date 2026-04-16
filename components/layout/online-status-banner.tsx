@@ -29,7 +29,7 @@ export function OnlineStatusBanner() {
       role="status"
       className="border-b border-amber-500/35 bg-[color-mix(in_srgb,amber_12%,var(--color-surface-secondary))] px-4 py-2"
     >
-      <div className="mx-auto max-w-6xl flex items-center gap-2 text-xs font-medium text-amber-950 dark:text-amber-100">
+      <div className="mx-auto max-w-7xl flex items-center gap-2 text-xs font-medium text-amber-950 dark:text-amber-100">
         <WifiOff size={14} strokeWidth={1.75} className="shrink-0" aria-hidden />
         <span>
           Você está offline. Os dados podem estar desatualizados até a conexão voltar.

@@ -8,20 +8,48 @@
   --radius-control: 0.75rem;
   --radius-card: 1rem;
 
-  --color-surface: #ffffff;
-  --color-surface-secondary: #f8f9fb;
+  --color-surface: #f6f7fb;
+  --color-surface-secondary: #eef0f6;
   --color-surface-elevated: #ffffff;
-  --color-border: #e4e7ec;
-  --color-border-subtle: #f0f1f4;
-  --color-text-primary: #0a0a0b;
-  --color-text-secondary: #5f6980;
-  --color-text-tertiary: #737d92;
-  --color-accent: #6c5ce7;
-  --color-accent-light: #a29bfe;
-  --color-accent-muted: color-mix(in srgb, var(--color-accent) 11%, transparent);
-  --color-accent-muted-hover: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  --color-success: #00b894;
-  --color-error: #e17055;
+  --color-border: #e1e4ed;
+  --color-border-subtle: #eceff5;
+  --color-text-primary: #0b1020;
+  --color-text-secondary: #4b5674;
+  --color-text-tertiary: #6b7388;
+  --color-accent: #5b4cdb;
+  --color-accent-light: #9d92f6;
+  --color-accent-muted: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-muted-hover: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --color-success: #0d9f78;
+  --color-error: #e4563c;
+
+  /* Stat and chart accents (pair with color-mix for fills) */
+  --color-chart-violet: #5b21b6;
+  --color-chart-rose: #be123c;
+  --color-chart-emerald: #047857;
+  --color-chart-sky: #0369a1;
+
+  --shadow-xs: 0 1px 0 color-mix(in srgb, var(--color-border) 55%, transparent);
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #0f172a 6%, transparent),
+    0 4px 12px -6px color-mix(in srgb, #0f172a 14%, transparent);
+  --shadow-md: 0 2px 4px color-mix(in srgb, #0f172a 5%, transparent),
+    0 12px 32px -14px color-mix(in srgb, #0f172a 18%, transparent);
+  --shadow-card: var(--shadow-sm);
+  --shadow-icon: 0 1px 2px color-mix(in srgb, #0f172a 8%, transparent);
+  --shadow-nav: 0 12px 40px -28px color-mix(in srgb, var(--color-accent) 35%, #0f172a);
+}
+
+@keyframes ep-slide-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ep-sheet-panel {
+  animation: ep-slide-in-right 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 html {
@@ -43,6 +71,10 @@ html {
     animation: none !important;
   }
 
+  .ep-sheet-panel {
+    animation: none !important;
+  }
+
   .animate-pulse {
     animation: none !important;
   }
@@ -50,6 +82,53 @@ html {
 
 body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "ss03";
+  text-rendering: optimizeLegibility;
+}
+
+.app-shell-bg {
+  background-color: var(--color-surface);
+  background-image: radial-gradient(
+      120% 70% at 18% -8%,
+      color-mix(in srgb, var(--color-accent) 14%, transparent),
+      transparent 52%
+    ),
+    radial-gradient(
+      90% 55% at 100% 0%,
+      color-mix(in srgb, var(--color-accent-light) 10%, transparent),
+      transparent 48%
+    );
+}
+
+.surface-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + 0.125rem);
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, var(--color-accent) 22%);
+  background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-elevated) 92%, var(--color-accent-muted)) 0%,
+      var(--color-surface-elevated) 48%,
+      var(--color-surface-elevated) 100%
+    );
+  box-shadow: var(--shadow-md);
+}
+
+.surface-hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto 40%;
+  height: 70%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-accent) 16%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.surface-hero > * {
+  position: relative;
 }
 
 :where(a, button, input, select, textarea):focus-visible {
@@ -63,21 +142,58 @@ body {
 }
 
 .dark {
-  --color-surface: #0c0c0f;
-  --color-surface-secondary: #111116;
-  --color-surface-elevated: #16161c;
-  --color-border: #1e1e26;
+  --color-surface: #07080d;
+  --color-surface-secondary: #0e1018;
+  --color-surface-elevated: #12141f;
+  --color-border: #222633;
   /* Slightly lighter than surfaces so dividers stay visible */
-  --color-border-subtle: #24242e;
-  --color-text-primary: #f0f0f4;
-  --color-text-secondary: #8b8fa4;
-  --color-text-tertiary: #7a8299;
+  --color-border-subtle: #2a2d3d;
+  --color-text-primary: #eef0f7;
+  --color-text-secondary: #9aa3b8;
+  --color-text-tertiary: #7c8499;
   --color-accent: #8b7cf6;
-  --color-accent-light: #b0a6f8;
-  --color-accent-muted: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  --color-accent-muted-hover: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  --color-success: #00d9a0;
-  --color-error: #ff7b6b;
+  --color-accent-light: #bdb4fb;
+  --color-accent-muted: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --color-accent-muted-hover: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  --color-success: #34d399;
+  --color-error: #fb7185;
+
+  --color-chart-violet: #c4b5fd;
+  --color-chart-rose: #fda4af;
+  --color-chart-emerald: #6ee7b7;
+  --color-chart-sky: #7dd3fc;
+
+  --shadow-xs: 0 1px 0 color-mix(in srgb, #fff 6%, transparent);
+  --shadow-sm: 0 1px 0 color-mix(in srgb, #fff 5%, transparent),
+    0 16px 40px -28px color-mix(in srgb, #000 65%, transparent);
+  --shadow-md: 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 24px 56px -32px color-mix(in srgb, #000 72%, transparent);
+  --shadow-card: var(--shadow-sm);
+  --shadow-icon: 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
+  --shadow-nav: 0 18px 48px -30px color-mix(in srgb, var(--color-accent) 28%, #000);
+}
+
+.dark .app-shell-bg {
+  background-image: radial-gradient(
+      100% 60% at 12% -6%,
+      color-mix(in srgb, var(--color-accent) 18%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      80% 50% at 100% 0%,
+      color-mix(in srgb, var(--color-accent-light) 8%, transparent),
+      transparent 50%
+    );
+}
+
+.dark .surface-hero {
+  border-color: color-mix(in srgb, var(--color-border) 70%, var(--color-accent) 30%);
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-surface-elevated) 88%, var(--color-accent-muted)) 0%,
+      var(--color-surface-elevated) 55%,
+      var(--color-surface-elevated) 100%
+    );
 }
 
 @keyframes float-slow {
@@ -111,16 +227,18 @@ body {
 .animate-shimmer { animation: shimmer 2.5s linear infinite; }
 
 .glass {
-  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: color-mix(in srgb, var(--color-surface-elevated) 78%, transparent);
+  backdrop-filter: blur(18px) saturate(185%);
+  -webkit-backdrop-filter: blur(18px) saturate(185%);
+  box-shadow: var(--shadow-nav);
 }
 
 .glass-card {
-  background: color-mix(in srgb, var(--color-surface-elevated) 60%, transparent);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: color-mix(in srgb, var(--color-surface-elevated) 68%, transparent);
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 

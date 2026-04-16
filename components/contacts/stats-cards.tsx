@@ -23,32 +23,36 @@ export function StatsCards({ contacts }: Props) {
       Icon: Users,
       label: "Total",
       value: total,
-      gradient: "from-violet-500/20 to-blue-500/20",
-      iconColor: "text-violet-500",
+      gradient:
+        "from-[color-mix(in_srgb,var(--color-chart-violet)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]",
+      iconColor: "text-[var(--color-chart-violet)]",
       hint: null as string | null,
     },
     {
       Icon: Cake,
       label: "Aniversários",
       value: birthdays,
-      gradient: "from-pink-500/20 to-orange-500/20",
-      iconColor: "text-pink-500",
+      gradient:
+        "from-[color-mix(in_srgb,var(--color-chart-rose)_22%,transparent)] to-[color-mix(in_srgb,var(--color-accent-light)_12%,transparent)]",
+      iconColor: "text-[var(--color-chart-rose)]",
       hint: null as string | null,
     },
     {
       Icon: Activity,
       label: "Para chamar",
       value: needsAttention,
-      gradient: "from-emerald-500/20 to-cyan-500/20",
-      iconColor: "text-emerald-500",
+      gradient:
+        "from-[color-mix(in_srgb,var(--color-chart-emerald)_22%,transparent)] to-[color-mix(in_srgb,var(--color-chart-sky)_12%,transparent)]",
+      iconColor: "text-[var(--color-chart-emerald)]",
       hint: null as string | null,
     },
     {
       Icon: MessageCircle,
       label: "Toques em 7 dias",
       value: touchedWeek,
-      gradient: "from-sky-500/20 to-indigo-500/15",
-      iconColor: "text-sky-600",
+      gradient:
+        "from-[color-mix(in_srgb,var(--color-chart-sky)_22%,transparent)] to-[color-mix(in_srgb,var(--color-chart-violet)_10%,transparent)]",
+      iconColor: "text-[var(--color-chart-sky)]",
       hint: "Último contato registrado nos últimos 7 dias.",
     },
   ] as const;

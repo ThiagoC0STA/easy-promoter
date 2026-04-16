@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Cake, LayoutDashboard, Users } from "lucide-react";
+import { PageHero } from "@/components/layout/page-hero";
 import type { Contact } from "@/lib/contacts/types";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { StatsCards } from "@/components/contacts/stats-cards";
@@ -49,52 +50,44 @@ export function PromoterDashboard({ contacts }: Props) {
   const segmentLines = buildSegmentInsightLines(contacts);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
-      <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-6 sm:p-10 mb-10">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-[var(--radius-card)] flex items-center justify-center bg-[var(--color-surface-elevated)] border border-[var(--color-border)] shadow-sm">
-              <LayoutDashboard
-                size={24}
-                strokeWidth={1.5}
-                className="text-[var(--color-accent)]"
-              />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">
-                Visão geral
-              </p>
-              <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-primary)] tracking-tight">
-                Dashboard
-              </h1>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-xl">
-                Gráficos da base, ritmo de contato e atalhos. A lista completa fica em
-                Contatos.
-              </p>
-              {priorityCount > 0 ? (
-                <p className="text-sm font-medium text-[var(--color-accent)] mt-3 max-w-xl">
-                  Há {priorityCount} contato{priorityCount === 1 ? "" : "s"} que{" "}
-                  {priorityCount === 1 ? "precisa" : "precisam"} de retomada. Veja a
-                  prioridade abaixo ou abra todos em Contatos.
-                </p>
-              ) : contacts.length > 0 ? (
-                <p className="text-sm text-[var(--color-text-tertiary)] mt-3 max-w-xl">
-                  Ninguém fora do ritmo ideal neste recorte. Bom momento para planejar
-                  próximos contatos.
-                </p>
-              ) : null}
-            </div>
-          </div>
-          <Link
-            href="/app/contacts"
-            className="btn-primary shrink-0 self-start sm:self-auto"
-          >
+    <div className="mx-auto max-w-7xl px-5 sm:px-8 py-10 sm:py-14">
+      <PageHero
+        eyebrow="Visão geral"
+        title="Dashboard"
+        description={
+          <>
+            Gráficos da base, ritmo de contato e atalhos. A lista completa fica em
+            Contatos.
+          </>
+        }
+        icon={
+          <LayoutDashboard
+            size={24}
+            strokeWidth={1.5}
+            className="text-[var(--color-accent)]"
+          />
+        }
+        actions={
+          <Link href="/app/contacts" className="btn-primary">
             <Users size={18} strokeWidth={1.75} />
             Abrir contatos
             <ArrowRight size={18} strokeWidth={1.75} />
           </Link>
-        </div>
-      </div>
+        }
+      >
+        {priorityCount > 0 ? (
+          <p className="text-sm font-medium text-[var(--color-accent)]">
+            Há {priorityCount} contato{priorityCount === 1 ? "" : "s"} que{" "}
+            {priorityCount === 1 ? "precisa" : "precisam"} de retomada. Veja a prioridade
+            abaixo ou abra todos em Contatos.
+          </p>
+        ) : contacts.length > 0 ? (
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            Ninguém fora do ritmo ideal neste recorte. Bom momento para planejar próximos
+            contatos.
+          </p>
+        ) : null}
+      </PageHero>
 
       <div className="flex flex-col gap-10">
         <DayQueueFreshnessBanner contacts={contacts} />
@@ -102,7 +95,7 @@ export function PromoterDashboard({ contacts }: Props) {
 
         {segmentLines.length > 0 ? (
           <section aria-label="Resumo por segmento">
-            <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-2">
+            <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-3 pl-1 border-l-2 border-[var(--color-accent-muted)]">
               Resumo por segmento
             </h2>
             <ul className="flex flex-col gap-1.5">
@@ -121,7 +114,7 @@ export function PromoterDashboard({ contacts }: Props) {
         <DayQueueSection contacts={contacts} />
 
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-3 pl-1 border-l-2 border-[var(--color-accent-muted)]">
             Gráficos
           </h2>
           <DashboardCharts contacts={contacts} />
@@ -130,7 +123,7 @@ export function PromoterDashboard({ contacts }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <section>
             <div className="flex items-center justify-between gap-4 mb-4">
-              <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] pl-1 border-l-2 border-[var(--color-accent-muted)]">
                 Prioridade (frio ou sem registro)
               </h2>
               <Link
@@ -170,8 +163,8 @@ export function PromoterDashboard({ contacts }: Props) {
 
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <Cake size={16} strokeWidth={1.5} className="text-pink-500" />
-              <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+              <Cake size={16} strokeWidth={1.5} className="text-[var(--color-chart-rose)]" />
+              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] pl-1 border-l-2 border-[color-mix(in_srgb,var(--color-chart-rose)_35%,transparent)]">
                 Aniversários (7 dias)
               </h2>
             </div>
@@ -187,12 +180,12 @@ export function PromoterDashboard({ contacts }: Props) {
                     <li key={c.id}>
                       <Link
                         href={`/app/contacts/${c.id}/edit`}
-                        className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-pink-500/40 transition-colors"
+                        className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-3 no-underline hover:border-[color-mix(in_srgb,var(--color-chart-rose)_42%,var(--color-border))] transition-colors"
                       >
                         <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
                           {c.name}
                         </span>
-                        <span className="text-xs font-medium text-pink-500 shrink-0">
+                        <span className="text-xs font-medium text-[var(--color-chart-rose)] shrink-0">
                           {d === 0 ? "Hoje" : `Em ${d}d`}
                         </span>
                       </Link>

@@ -8,7 +8,7 @@ export default function AuthedShellLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-surface)]">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:px-4 focus:py-2.5 focus:rounded-xl focus:bg-[var(--color-surface-elevated)] focus:text-[var(--color-text-primary)] focus:border focus:border-[var(--color-accent)] focus:shadow-lg"
