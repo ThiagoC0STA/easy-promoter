@@ -71,7 +71,7 @@ export function AppHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-[var(--color-border)]">
+    <header className="sticky top-0 z-50 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-6">
@@ -92,31 +92,33 @@ export function AppHeader() {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
-              <NavLink
-                href="/app"
-                active={dashboardActive}
-                icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
-              >
-                Dashboard
-              </NavLink>
-              <NavLink
-                href="/app/contacts"
-                active={contactsActive}
-                icon={<Users size={15} strokeWidth={1.5} />}
-              >
-                Contatos
-              </NavLink>
-              {role === "super_admin" && (
+            {email && (
+              <nav className="hidden md:flex items-center gap-1">
                 <NavLink
-                  href="/admin"
-                  active={adminActive}
-                  icon={<Shield size={15} strokeWidth={1.5} />}
+                  href="/app"
+                  active={dashboardActive}
+                  icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
                 >
-                  Admin
+                  Dashboard
                 </NavLink>
-              )}
-            </nav>
+                <NavLink
+                  href="/app/contacts"
+                  active={contactsActive}
+                  icon={<Users size={15} strokeWidth={1.5} />}
+                >
+                  Contatos
+                </NavLink>
+                {role === "super_admin" && (
+                  <NavLink
+                    href="/admin"
+                    active={adminActive}
+                    icon={<Shield size={15} strokeWidth={1.5} />}
+                  >
+                    Admin
+                  </NavLink>
+                )}
+              </nav>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -167,19 +169,21 @@ export function AppHeader() {
         </div>
       </div>
 
-      <div className="md:hidden border-t border-[var(--color-border)] px-5 py-2 flex gap-2 flex-wrap">
-        <MobileNavLink href="/app" active={dashboardActive}>
-          Dashboard
-        </MobileNavLink>
-        <MobileNavLink href="/app/contacts" active={contactsActive}>
-          Contatos
-        </MobileNavLink>
-        {role === "super_admin" && (
-          <MobileNavLink href="/admin" active={adminActive}>
-            Admin
+      {email && (
+        <div className="md:hidden border-t border-[var(--color-border)] px-5 py-2 flex gap-2 flex-wrap">
+          <MobileNavLink href="/app" active={dashboardActive}>
+            Dashboard
           </MobileNavLink>
-        )}
-      </div>
+          <MobileNavLink href="/app/contacts" active={contactsActive}>
+            Contatos
+          </MobileNavLink>
+          {role === "super_admin" && (
+            <MobileNavLink href="/admin" active={adminActive}>
+              Admin
+            </MobileNavLink>
+          )}
+        </div>
+      )}
 
       <KeyboardShortcutsModal
         open={shortcutsOpen}

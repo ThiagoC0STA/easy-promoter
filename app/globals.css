@@ -124,17 +124,8 @@ body {
 }
 
 .app-shell-bg {
-  background-color: var(--color-surface);
-  background-image: radial-gradient(
-      120% 70% at 18% -8%,
-      color-mix(in srgb, var(--color-accent) 14%, transparent),
-      transparent 52%
-    ),
-    radial-gradient(
-      90% 55% at 100% 0%,
-      color-mix(in srgb, var(--color-accent-light) 10%, transparent),
-      transparent 48%
-    );
+  background: var(--color-surface);
+  background-image: none;
 }
 
 .surface-hero {
@@ -154,12 +145,12 @@ body {
 }
 
 .dark {
-  --color-surface: #07080d;
-  --color-surface-secondary: #0e1018;
-  --color-surface-elevated: #12141f;
-  --color-border: #222633;
+  --color-surface: #05060a;
+  --color-surface-secondary: #0a0b11;
+  --color-surface-elevated: #0c0d14;
+  --color-border: #1a1c27;
   /* Slightly lighter than surfaces so dividers stay visible */
-  --color-border-subtle: #2a2d3d;
+  --color-border-subtle: #22242f;
   --color-text-primary: #eef0f7;
   --color-text-secondary: #9aa3b8;
   --color-text-tertiary: #7c8499;
@@ -183,19 +174,6 @@ body {
   --shadow-card: var(--shadow-sm);
   --shadow-icon: 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
   --shadow-nav: 0 18px 48px -30px color-mix(in srgb, var(--color-accent) 28%, #000);
-}
-
-.dark .app-shell-bg {
-  background-image: radial-gradient(
-      100% 60% at 12% -6%,
-      color-mix(in srgb, var(--color-accent) 18%, transparent),
-      transparent 55%
-    ),
-    radial-gradient(
-      80% 50% at 100% 0%,
-      color-mix(in srgb, var(--color-accent-light) 8%, transparent),
-      transparent 50%
-    );
 }
 
 .dark .surface-hero {
