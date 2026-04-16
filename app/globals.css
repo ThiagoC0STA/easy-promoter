@@ -145,12 +145,12 @@ body {
 }
 
 .dark {
-  --color-surface: #07080d;
-  --color-surface-secondary: #0e1018;
-  --color-surface-elevated: #12141f;
-  --color-border: #222633;
+  --color-surface: #05060a;
+  --color-surface-secondary: #0a0b11;
+  --color-surface-elevated: #0c0d14;
+  --color-border: #1a1c27;
   /* Slightly lighter than surfaces so dividers stay visible */
-  --color-border-subtle: #2a2d3d;
+  --color-border-subtle: #22242f;
   --color-text-primary: #eef0f7;
   --color-text-secondary: #9aa3b8;
   --color-text-tertiary: #7c8499;
