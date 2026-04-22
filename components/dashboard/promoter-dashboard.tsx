@@ -62,7 +62,7 @@ export function PromoterDashboard({ contacts }: Props) {
             <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
                             bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
               <AlertTriangle size={12} strokeWidth={2} />
-              {priorityCount} ação{priorityCount !== 1 ? "ões" : ""} urgente{priorityCount !== 1 ? "s" : ""}
+              {priorityCount} {priorityCount === 1 ? "ação urgente" : "ações urgentes"}
             </div>
           )}
         </div>
