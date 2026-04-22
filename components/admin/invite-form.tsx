@@ -1,21 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { AlertCircle, AlertTriangle, CheckCircle2, Mail, RefreshCw, Send, ShieldAlert } from "lucide-react";
+import { AlertCircle, AlertTriangle, Check, CheckCircle2, Copy, Mail, MessageCircle, RefreshCw, Send, ShieldAlert } from "lucide-react";
 
 type Status =
   | { type: "idle" }
-  | { type: "success"; email: string }
+  | { type: "success"; email: string; link: string }
   | { type: "error"; message: string; canResend?: boolean; email?: string }
-  | { type: "resent"; email: string };
+  | { type: "resent"; email: string; link: string };
 
 export function InviteForm() {
   const [email, setEmail] = React.useState("");
   const [asSuperAdmin, setAsSuperAdmin] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [status, setStatus] = React.useState<Status>({ type: "idle" });
+  const [copied, setCopied] = React.useState(false);
 
-  async function send(emailToSend: string, role: string) {
+  async function send(emailToSend: string, role: string): Promise<{ link: string } | null> {
     setBusy(true);
     try {
       const res = await fetch("/api/admin/invite", {
@@ -23,18 +24,19 @@ export function InviteForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailToSend.trim(), role }),
       });
-      let payload: { ok?: boolean; error?: string } = {};
+      let payload: { ok?: boolean; error?: string; inviteLink?: string } = {};
       try { payload = (await res.json()) as typeof payload; } catch { /* ignore */ }
 
-      if (!res.ok || !payload.ok) {
-        const msg = payload.error ?? "Não foi possível enviar o convite.";
+      if (!res.ok || !payload.ok || !payload.inviteLink) {
+        const msg = payload.error ?? "Não foi possível gerar o convite.";
         const canResend = msg.includes("convite pendente");
         setStatus({ type: "error", message: msg, canResend, email: emailToSend });
-        return;
+        return null;
       }
-      return true;
+      return { link: payload.inviteLink };
     } catch {
       setStatus({ type: "error", message: "Sem conexão. Verifique a internet e tente de novo." });
+      return null;
     } finally {
       setBusy(false);
     }
@@ -43,9 +45,10 @@ export function InviteForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus({ type: "idle" });
-    const ok = await send(email, asSuperAdmin ? "super_admin" : "promoter");
-    if (ok) {
-      setStatus({ type: "success", email });
+    setCopied(false);
+    const result = await send(email, asSuperAdmin ? "super_admin" : "promoter");
+    if (result) {
+      setStatus({ type: "success", email, link: result.link });
       setEmail("");
       setAsSuperAdmin(false);
     }
@@ -55,8 +58,22 @@ export function InviteForm() {
     if (status.type !== "error" || !status.email) return;
     const savedEmail = status.email;
     setStatus({ type: "idle" });
-    const ok = await send(savedEmail, asSuperAdmin ? "super_admin" : "promoter");
-    if (ok) setStatus({ type: "resent", email: savedEmail });
+    setCopied(false);
+    const result = await send(savedEmail, asSuperAdmin ? "super_admin" : "promoter");
+    if (result) setStatus({ type: "resent", email: savedEmail, link: result.link });
+  }
+
+  async function copyLink(link: string) {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  }
+
+  function whatsappUrl(email: string, link: string) {
+    const msg = `Olá! Seu convite de acesso ao Easy Promoter está pronto.\n\nClique aqui pra criar sua senha:\n${link}\n\n(link pessoal — não compartilhe)`;
+    return `https://wa.me/?text=${encodeURIComponent(msg)}`;
   }
 
   return (
@@ -122,12 +139,47 @@ export function InviteForm() {
             </div>
           )}
           {(status.type === "success" || status.type === "resent") && (
-            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-success)_25%,transparent)]">
-              <CheckCircle2 size={16} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" />
-              <span className="text-sm text-[var(--color-success)]">
-                {status.type === "resent" ? "Convite reenviado para " : "Convite enviado para "}
-                <strong>{status.email}</strong>. A pessoa precisa abrir o e-mail para ativar o acesso.
-              </span>
+            <div className="flex flex-col gap-3 p-3.5 rounded-xl bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-success)_25%,transparent)]">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 size={16} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" />
+                <span className="text-sm text-[var(--color-success)]">
+                  Convite gerado para <strong>{status.email}</strong>. Envie o link abaixo pela ferramenta de sua preferência — ele é pessoal e de uso único.
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-[var(--color-surface-2,rgba(0,0,0,0.2))] border border-[var(--color-border)]">
+                <code className="flex-1 text-xs text-[var(--color-text-secondary)] truncate font-mono" title={status.link}>
+                  {status.link}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => void copyLink(status.link)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover,var(--color-surface))] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors cursor-pointer shrink-0"
+                  aria-label="Copiar link"
+                >
+                  {copied ? (
+                    <>
+                      <Check size={12} strokeWidth={2.25} className="text-[var(--color-success)]" />
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} strokeWidth={2} />
+                      Copiar
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <a
+                href={whatsappUrl(status.email, status.link)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] transition-colors"
+              >
+                <MessageCircle size={14} strokeWidth={2} />
+                Abrir WhatsApp com mensagem pronta
+              </a>
             </div>
           )}
         </div>
@@ -137,11 +189,11 @@ export function InviteForm() {
           {busy ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Enviando…
+              Gerando…
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              Enviar convite
+              Gerar link de convite
               <Send size={15} strokeWidth={1.75} />
             </span>
           )}
