@@ -7,6 +7,7 @@ import {
   daysSinceContact,
   daysUntilBirthday,
   isBirthdaySoon,
+  needsAttention,
 } from "@/lib/contacts/utils";
 import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { useFilteredDayQueue } from "@/components/dashboard/use-filtered-day-queue";
@@ -14,11 +15,6 @@ import { useFilteredDayQueue } from "@/components/dashboard/use-filtered-day-que
 type Props = {
   contacts: Contact[];
 };
-
-function needsAttention(contact: Contact): boolean {
-  const days = daysSinceContact(contact.last_contacted_at);
-  return days === null || days >= COOLDOWN_DAYS;
-}
 
 export function DayQueueSection({ contacts }: Props) {
   const queue = useFilteredDayQueue(contacts, 10);

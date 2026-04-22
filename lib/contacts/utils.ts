@@ -1,9 +1,17 @@
+import type { Contact } from "./types";
 import { COOLDOWN_DAYS } from "./types";
 
 export function daysSinceContact(lastContactedAt: string | null): number | null {
   if (!lastContactedAt) return null;
-  const diff = Date.now() - new Date(lastContactedAt).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  const last = new Date(lastContactedAt);
+  const lastMidnight = new Date(last.getFullYear(), last.getMonth(), last.getDate());
+  const today = todayMidnight();
+  return Math.round((today.getTime() - lastMidnight.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function needsAttention(contact: Contact): boolean {
+  const days = daysSinceContact(contact.last_contacted_at);
+  return days === null || days >= COOLDOWN_DAYS;
 }
 
 /**

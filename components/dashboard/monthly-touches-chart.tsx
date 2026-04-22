@@ -105,7 +105,7 @@ export function MonthlyTouchesChart({ contacts }: Props) {
         </div>
       ) : (
         <div className="h-56 sm:h-64 -mx-2">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <LineChart data={data} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
               <CartesianGrid
                 strokeDasharray="3 3"

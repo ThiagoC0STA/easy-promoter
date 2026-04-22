@@ -2,7 +2,6 @@ import Link from "next/link";
 import { AlertTriangle, ArrowRight, Cake, Clock, Users } from "lucide-react";
 
 import type { Contact } from "@/lib/contacts/types";
-import { COOLDOWN_DAYS } from "@/lib/contacts/types";
 import { StatsCards } from "@/components/contacts/stats-cards";
 import { DayQueueFreshnessBanner } from "@/components/dashboard/day-queue-freshness-banner";
 import { DayQueueSection } from "@/components/dashboard/day-queue-section";
@@ -11,31 +10,16 @@ import {
   daysSinceContact,
   isBirthdaySoon,
   daysUntilBirthday,
+  needsAttention,
 } from "@/lib/contacts/utils";
 
 type Props = {
   contacts: Contact[];
 };
 
-function needsAttention(contact: Contact): boolean {
-  const days = daysSinceContact(contact.last_contacted_at);
-  return days === null || days >= COOLDOWN_DAYS;
-}
-
 export function PromoterDashboard({ contacts }: Props) {
   const priorityAll = contacts.filter(needsAttention);
   const priorityCount = priorityAll.length;
-
-  const priority = [...priorityAll]
-    .sort((a, b) => {
-      const da = daysSinceContact(a.last_contacted_at);
-      const db = daysSinceContact(b.last_contacted_at);
-      if (da === null && db === null) return 0;
-      if (da === null) return -1;
-      if (db === null) return 1;
-      return db - da;
-    })
-    .slice(0, 8);
 
   const birthdays = contacts
     .filter((c) => isBirthdaySoon(c.birthday))
@@ -43,6 +27,19 @@ export function PromoterDashboard({ contacts }: Props) {
       const da = daysUntilBirthday(a.birthday) ?? 999;
       const db = daysUntilBirthday(b.birthday) ?? 999;
       return da - db;
+    })
+    .slice(0, 8);
+
+  const birthdayIds = new Set(birthdays.map((c) => c.id));
+  const priority = priorityAll
+    .filter((c) => !birthdayIds.has(c.id))
+    .sort((a, b) => {
+      const da = daysSinceContact(a.last_contacted_at);
+      const db = daysSinceContact(b.last_contacted_at);
+      if (da === null && db === null) return 0;
+      if (da === null) return -1;
+      if (db === null) return 1;
+      return db - da;
     })
     .slice(0, 8);
 
@@ -157,6 +154,8 @@ export function PromoterDashboard({ contacts }: Props) {
             <ul className="flex flex-col gap-1.5">
               {birthdays.map((c) => {
                 const d = daysUntilBirthday(c.birthday);
+                const attention = needsAttention(c);
+                const days = daysSinceContact(c.last_contacted_at);
                 return (
                   <li key={c.id}>
                     <Link
@@ -166,8 +165,15 @@ export function PromoterDashboard({ contacts }: Props) {
                       <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
                         {c.name}
                       </span>
-                      <span className={`text-xs font-semibold shrink-0 ${d === 0 ? "text-pink-400" : "text-[var(--color-text-tertiary)]"}`}>
-                        {d === 0 ? "Hoje" : `Em ${d}d`}
+                      <span className="flex items-center gap-2 shrink-0">
+                        {attention && (
+                          <span className="text-[10px] font-semibold text-red-400 uppercase tracking-wide">
+                            {days === null ? "Nunca" : `${days}d`}
+                          </span>
+                        )}
+                        <span className={`text-xs font-semibold ${d === 0 ? "text-pink-400" : "text-[var(--color-text-tertiary)]"}`}>
+                          {d === 0 ? "Hoje" : `Em ${d}d`}
+                        </span>
                       </span>
                     </Link>
                   </li>
