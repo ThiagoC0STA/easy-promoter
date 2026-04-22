@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const isAuthPage = pathname === "/login";
+  const isWelcomePage = pathname === "/bem-vindo";
   const isProtectedPage =
     pathname.startsWith("/app") || pathname.startsWith("/admin");
 
@@ -44,10 +45,28 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (user && isAuthPage) {
-    const appUrl = request.nextUrl.clone();
-    appUrl.pathname = "/app";
-    return NextResponse.redirect(appUrl);
+  if (user) {
+    const metadata = (user.user_metadata ?? {}) as { password_set?: boolean };
+    const needsPassword = metadata.password_set !== true;
+
+    if (needsPassword && !isWelcomePage) {
+      const welcomeUrl = request.nextUrl.clone();
+      welcomeUrl.pathname = "/bem-vindo";
+      welcomeUrl.search = "";
+      return NextResponse.redirect(welcomeUrl);
+    }
+
+    if (!needsPassword && isAuthPage) {
+      const appUrl = request.nextUrl.clone();
+      appUrl.pathname = "/app";
+      return NextResponse.redirect(appUrl);
+    }
+
+    if (!needsPassword && isWelcomePage) {
+      const appUrl = request.nextUrl.clone();
+      appUrl.pathname = "/app";
+      return NextResponse.redirect(appUrl);
+    }
   }
 
   return supabaseResponse;

@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   const admin = createServiceRoleSupabaseClient();
   const redirectTo = `${getAppOrigin()}/auth/confirm`;
 
-  const { data, error } = await admin.auth.admin.generateLink({
+  const inviteResult = await admin.auth.admin.generateLink({
     type: "invite",
     email,
     options: {
@@ -71,20 +71,50 @@ export async function POST(request: Request) {
     },
   });
 
-  if (error) {
-    return NextResponse.json(
-      { ok: false, error: mapInviteUserErrorMessage(error.message) },
-      { status: 400 },
-    );
+  let actionLink = inviteResult.data.properties?.action_link ?? null;
+  let userId = inviteResult.data.user?.id ?? null;
+  let regenerated = false;
+
+  if (inviteResult.error) {
+    const msg = inviteResult.error.message.toLowerCase();
+    const alreadyExists =
+      msg.includes("already") &&
+      (msg.includes("registered") ||
+        msg.includes("exists") ||
+        msg.includes("user"));
+
+    if (!alreadyExists) {
+      return NextResponse.json(
+        { ok: false, error: mapInviteUserErrorMessage(inviteResult.error.message) },
+        { status: 400 },
+      );
+    }
+
+    // Usuário já existe (aba fechada antes de criar senha, ou reenvio).
+    // Gera um recovery link — funciona pra user existente e cai no /bem-vindo.
+    const recoveryResult = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: { redirectTo },
+    });
+
+    if (recoveryResult.error) {
+      return NextResponse.json(
+        { ok: false, error: mapInviteUserErrorMessage(recoveryResult.error.message) },
+        { status: 400 },
+      );
+    }
+
+    actionLink = recoveryResult.data.properties?.action_link ?? null;
+    userId = recoveryResult.data.user?.id ?? null;
+    regenerated = true;
   }
 
-  const actionLink = data.properties?.action_link ?? null;
   if (!actionLink) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          "Convite criado, mas o link não foi retornado. Tente novamente.",
+        error: "Convite criado, mas o link não foi retornado. Tente novamente.",
       },
       { status: 500 },
     );
@@ -92,8 +122,9 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    userId: data.user?.id ?? null,
+    userId,
     inviteLink: actionLink,
     email,
+    regenerated,
   });
 }

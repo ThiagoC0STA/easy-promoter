@@ -33,7 +33,10 @@ export function SetPasswordForm({ email, invitedAsSuperAdmin }: Props) {
     }
 
     setBusy(true);
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    const { error: updateError } = await supabase.auth.updateUser({
+      password,
+      data: { password_set: true },
+    });
     setBusy(false);
 
     if (updateError) {

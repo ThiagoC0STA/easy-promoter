@@ -5,9 +5,9 @@ import { AlertCircle, AlertTriangle, Check, CheckCircle2, Copy, Mail, MessageCir
 
 type Status =
   | { type: "idle" }
-  | { type: "success"; email: string; link: string }
+  | { type: "success"; email: string; link: string; regenerated: boolean }
   | { type: "error"; message: string; canResend?: boolean; email?: string }
-  | { type: "resent"; email: string; link: string };
+  | { type: "resent"; email: string; link: string; regenerated: boolean };
 
 export function InviteForm() {
   const [email, setEmail] = React.useState("");
@@ -16,7 +16,10 @@ export function InviteForm() {
   const [status, setStatus] = React.useState<Status>({ type: "idle" });
   const [copied, setCopied] = React.useState(false);
 
-  async function send(emailToSend: string, role: string): Promise<{ link: string } | null> {
+  async function send(
+    emailToSend: string,
+    role: string,
+  ): Promise<{ link: string; regenerated: boolean } | null> {
     setBusy(true);
     try {
       const res = await fetch("/api/admin/invite", {
@@ -24,7 +27,12 @@ export function InviteForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailToSend.trim(), role }),
       });
-      let payload: { ok?: boolean; error?: string; inviteLink?: string } = {};
+      let payload: {
+        ok?: boolean;
+        error?: string;
+        inviteLink?: string;
+        regenerated?: boolean;
+      } = {};
       try { payload = (await res.json()) as typeof payload; } catch { /* ignore */ }
 
       if (!res.ok || !payload.ok || !payload.inviteLink) {
@@ -33,7 +41,7 @@ export function InviteForm() {
         setStatus({ type: "error", message: msg, canResend, email: emailToSend });
         return null;
       }
-      return { link: payload.inviteLink };
+      return { link: payload.inviteLink, regenerated: payload.regenerated === true };
     } catch {
       setStatus({ type: "error", message: "Sem conexão. Verifique a internet e tente de novo." });
       return null;
@@ -48,7 +56,7 @@ export function InviteForm() {
     setCopied(false);
     const result = await send(email, asSuperAdmin ? "super_admin" : "promoter");
     if (result) {
-      setStatus({ type: "success", email, link: result.link });
+      setStatus({ type: "success", email, link: result.link, regenerated: result.regenerated });
       setEmail("");
       setAsSuperAdmin(false);
     }
@@ -60,7 +68,7 @@ export function InviteForm() {
     setStatus({ type: "idle" });
     setCopied(false);
     const result = await send(savedEmail, asSuperAdmin ? "super_admin" : "promoter");
-    if (result) setStatus({ type: "resent", email: savedEmail, link: result.link });
+    if (result) setStatus({ type: "resent", email: savedEmail, link: result.link, regenerated: result.regenerated });
   }
 
   async function copyLink(link: string) {
@@ -143,7 +151,15 @@ export function InviteForm() {
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 size={16} strokeWidth={1.5} className="text-[var(--color-success)] mt-0.5 shrink-0" />
                 <span className="text-sm text-[var(--color-success)]">
-                  Convite gerado para <strong>{status.email}</strong>. Envie o link abaixo pela ferramenta de sua preferência — ele é pessoal e de uso único.
+                  {status.regenerated ? (
+                    <>
+                      Esta pessoa já tinha conta — geramos um <strong>novo link</strong> para <strong>{status.email}</strong>. Envie o link abaixo; ele é pessoal e de uso único.
+                    </>
+                  ) : (
+                    <>
+                      Convite gerado para <strong>{status.email}</strong>. Envie o link abaixo pela ferramenta de sua preferência — ele é pessoal e de uso único.
+                    </>
+                  )}
                 </span>
               </div>
 
