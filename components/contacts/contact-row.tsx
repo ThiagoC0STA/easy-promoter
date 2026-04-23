@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { createPortal } from "react-dom";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Cake, Edit, MoreHorizontal } from "lucide-react";
+import { Cake, Edit } from "lucide-react";
 import { WhatsAppGlyph } from "@/components/icons/whatsapp-glyph";
 import type { Contact } from "@/lib/contacts/types";
 import { FREQUENCY_OPTIONS, SPENDING_OPTIONS } from "@/lib/contacts/types";
@@ -48,109 +47,65 @@ function ContactActions({ contact, readOnly, waUrl, igUrl }: {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [open, setOpen] = React.useState(false);
-  const [pos, setPos] = React.useState({ top: 0, right: 0 });
-  const [mounted, setMounted] = React.useState(false);
-  const btnRef = React.useRef<HTMLButtonElement>(null);
-  const menuRef = React.useRef<HTMLDivElement>(null);
   const waLaunch = React.useRef<(() => void) | null>(null);
   const igLaunch = React.useRef<(() => void) | null>(null);
 
   function handleOpenEdit() {
-    setOpen(false);
     const next = new URLSearchParams(searchParams.toString());
     next.set("edit", contact.id);
     router.push(`${pathname}?${next.toString()}`, { scroll: false });
   }
 
-  React.useEffect(() => { setMounted(true); }, []);
-
-  React.useEffect(() => {
-    if (!open) return;
-    function onDown(e: MouseEvent) {
-      const t = e.target as Node;
-      if (!btnRef.current?.contains(t) && !menuRef.current?.contains(t)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
-
-  function handleToggle() {
-    if (!open && btnRef.current) {
-      const r = btnRef.current.getBoundingClientRect();
-      setPos({ top: r.bottom + window.scrollY + 4, right: window.innerWidth - r.right });
-    }
-    setOpen((v) => !v);
-  }
-
   const hasActions = waUrl || igUrl || !readOnly;
   if (!hasActions) return null;
 
-  const dropdown = open && mounted ? createPortal(
-    <div
-      ref={menuRef}
-      className="fixed z-[9999] w-44 rounded-[var(--radius-control)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-md)] overflow-hidden py-1"
-      style={{ top: pos.top, right: pos.right }}
-    >
-      {waUrl && (
-        <button type="button"
-          onClick={() => { setOpen(false); readOnly ? window.open(waUrl, "_blank", "noopener,noreferrer") : waLaunch.current?.(); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer">
-          <span className="text-emerald-500 flex items-center"><WhatsAppGlyph size={13} /></span>
-          WhatsApp
-        </button>
-      )}
-      {igUrl && (
-        <button type="button"
-          onClick={() => { setOpen(false); readOnly ? window.open(igUrl, "_blank", "noopener,noreferrer") : igLaunch.current?.(); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer">
-          <span className="text-pink-500 flex items-center"><InstagramGlyphStatic /></span>
-          Instagram
-        </button>
-      )}
-      {!readOnly && (
-        <>
-          {(waUrl || igUrl) && <div className="my-1 border-t border-[var(--color-border-subtle)]" />}
-          <button type="button"
-            onClick={handleOpenEdit}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer">
-            <span className="text-[var(--color-text-tertiary)] flex items-center"><Edit size={13} strokeWidth={1.75} /></span>
-            Editar
-          </button>
-        </>
-      )}
-    </div>,
-    document.body,
-  ) : null;
-
   return (
-    <>
-      {/* Launchers always mounted — modal portal survives dropdown closing */}
+    <div className="flex items-center gap-1">
       {waUrl && !readOnly && (
         <ChannelTouchLauncher channel="whatsapp" href={waUrl} contactId={contact.id} contactName={contact.name}
-          renderTrigger={(onClick) => { waLaunch.current = onClick; return null; }}
+          renderTrigger={(onClick) => {
+            waLaunch.current = onClick;
+            return (
+              <button type="button" onClick={onClick} aria-label="WhatsApp"
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer">
+                <WhatsAppGlyph size={15} />
+              </button>
+            );
+          }}
         />
+      )}
+      {waUrl && readOnly && (
+        <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
+          className="h-8 w-8 rounded-lg flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-colors">
+          <WhatsAppGlyph size={15} />
+        </a>
       )}
       {igUrl && !readOnly && (
         <ChannelTouchLauncher channel="instagram" href={igUrl} contactId={contact.id} contactName={contact.name}
-          renderTrigger={(onClick) => { igLaunch.current = onClick; return null; }}
+          renderTrigger={(onClick) => {
+            igLaunch.current = onClick;
+            return (
+              <button type="button" onClick={onClick} aria-label="Instagram"
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-pink-500 hover:bg-pink-500/10 transition-colors cursor-pointer">
+                <InstagramGlyphStatic />
+              </button>
+            );
+          }}
         />
       )}
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={handleToggle}
-        aria-label="Ações"
-        className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer
-          ${open
-            ? "text-[var(--color-text-primary)] bg-[var(--color-surface-secondary)]"
-            : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]"
-          }`}
-      >
-        <MoreHorizontal size={15} strokeWidth={1.75} />
-      </button>
-      {dropdown}
-    </>
+      {igUrl && readOnly && (
+        <a href={igUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+          className="h-8 w-8 rounded-lg flex items-center justify-center text-pink-500 hover:bg-pink-500/10 transition-colors">
+          <InstagramGlyphStatic />
+        </a>
+      )}
+      {!readOnly && (
+        <button type="button" onClick={handleOpenEdit} aria-label="Editar"
+          className="h-8 w-8 rounded-lg flex items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer">
+          <Edit size={14} strokeWidth={1.75} />
+        </button>
+      )}
+    </div>
   );
 }
 
