@@ -2,7 +2,20 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SetPasswordForm } from "@/app/bem-vindo/set-password-form";
 
-export default async function WelcomePage() {
+type SearchParams = { recovery?: string | string[] };
+
+export default async function WelcomePage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const recoveryRaw = params.recovery;
+  const isRecovery =
+    typeof recoveryRaw === "string"
+      ? recoveryRaw === "1"
+      : Array.isArray(recoveryRaw) && recoveryRaw.includes("1");
+
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user;
@@ -15,7 +28,7 @@ export default async function WelcomePage() {
     role?: string;
     password_set?: boolean;
   };
-  if (metadata.password_set === true) {
+  if (!isRecovery && metadata.password_set === true) {
     redirect("/app");
   }
   const invitedAsSuperAdmin = metadata.role === "super_admin";
@@ -26,6 +39,7 @@ export default async function WelcomePage() {
         <SetPasswordForm
           email={user.email ?? ""}
           invitedAsSuperAdmin={invitedAsSuperAdmin}
+          isRecovery={isRecovery}
         />
       </div>
     </main>

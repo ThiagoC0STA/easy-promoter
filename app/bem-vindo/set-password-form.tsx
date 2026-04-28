@@ -8,9 +8,10 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 type Props = {
   email: string;
   invitedAsSuperAdmin: boolean;
+  isRecovery?: boolean;
 };
 
-export function SetPasswordForm({ email, invitedAsSuperAdmin }: Props) {
+export function SetPasswordForm({ email, invitedAsSuperAdmin, isRecovery = false }: Props) {
   const router = useRouter();
   const supabase = React.useMemo(() => createBrowserSupabaseClient(), []);
 
@@ -55,13 +56,22 @@ export function SetPasswordForm({ email, invitedAsSuperAdmin }: Props) {
           <Sparkles size={15} strokeWidth={1.75} className="text-[var(--color-accent)]" />
         </div>
         <h2 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">
-          Bem-vindo ao Easy Promoter
+          {isRecovery ? "Definir nova senha" : "Bem-vindo ao Easy Promoter"}
         </h2>
       </div>
       <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-        Defina uma senha para acessar sua conta. Você vai usar ela junto com{" "}
-        <strong className="text-[var(--color-text-primary)] font-medium">{email}</strong>{" "}
-        nos próximos logins.
+        {isRecovery ? (
+          <>
+            Escolha uma nova senha para{" "}
+            <strong className="text-[var(--color-text-primary)] font-medium">{email}</strong>.
+          </>
+        ) : (
+          <>
+            Defina uma senha para acessar sua conta. Você vai usar ela junto com{" "}
+            <strong className="text-[var(--color-text-primary)] font-medium">{email}</strong>{" "}
+            nos próximos logins.
+          </>
+        )}
       </p>
 
       {invitedAsSuperAdmin && (

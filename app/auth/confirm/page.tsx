@@ -56,8 +56,12 @@ export default function AuthConfirmPage() {
           router.replace(`/login?error=${encodeURIComponent(error.message)}`);
           return;
         }
-        const dest =
-          type === "invite" || type === "recovery" ? "/bem-vindo" : "/app";
+        let dest = "/app";
+        if (type === "recovery") {
+          dest = "/bem-vindo?recovery=1";
+        } else if (type === "invite") {
+          dest = "/bem-vindo";
+        }
         router.replace(dest);
         router.refresh();
       });

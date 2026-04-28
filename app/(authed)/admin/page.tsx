@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Activity, ScrollText } from "lucide-react";
-import { InviteForm } from "@/components/admin/invite-form";
+import { AdminAddUserTabs } from "@/components/admin/admin-add-user-tabs";
 import { PromotersList } from "@/components/admin/promoters-list";
 import { PromoterStatsTable } from "@/components/admin/promoter-stats-table";
 import { getPromoters, getPromoterStats } from "@/lib/admin/queries";
@@ -16,7 +16,7 @@ export default async function AdminHomePage() {
             Super admin
           </h1>
           <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
-            Convites e visão geral dos promoters
+            Adicionar usuários e visão geral dos promoters
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -40,9 +40,9 @@ export default async function AdminHomePage() {
       <div className="flex flex-col gap-8">
         <section>
           <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
-            Enviar convite
+            Adicionar usuário
           </h2>
-          <InviteForm />
+          <AdminAddUserTabs />
         </section>
 
         <section>
