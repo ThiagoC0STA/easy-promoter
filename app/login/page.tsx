@@ -16,7 +16,7 @@ export default async function LoginPage({
       ? decodeURIComponent(rawError)
       : null;
 
-  const resetRedirectUrl = `${getAppOrigin()}/auth/confirm`;
+  const resetRedirectUrl = `${getAppOrigin()}/auth/callback?next=${encodeURIComponent("/bem-vindo?recovery=1")}`;
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-surface)]">

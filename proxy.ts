@@ -48,6 +48,7 @@ export async function proxy(request: NextRequest) {
   if (user) {
     const metadata = (user.user_metadata ?? {}) as { password_set?: boolean };
     const needsPassword = metadata.password_set !== true;
+    const isRecovery = request.nextUrl.searchParams.get("recovery") === "1";
 
     if (needsPassword && !isWelcomePage) {
       const welcomeUrl = request.nextUrl.clone();
@@ -62,9 +63,10 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(appUrl);
     }
 
-    if (!needsPassword && isWelcomePage) {
+    if (!needsPassword && isWelcomePage && !isRecovery) {
       const appUrl = request.nextUrl.clone();
       appUrl.pathname = "/app";
+      appUrl.search = "";
       return NextResponse.redirect(appUrl);
     }
   }

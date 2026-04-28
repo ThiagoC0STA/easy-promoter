@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     email_confirm: true,
     user_metadata: {
       role: "promoter",
-      password_set: true,
+      password_set: false,
       ...(displayName ? { display_name: displayName } : {}),
     },
   });
