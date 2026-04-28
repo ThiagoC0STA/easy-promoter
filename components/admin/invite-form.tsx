@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AlertCircle, AlertTriangle, Check, CheckCircle2, Copy, Mail, MessageCircle, RefreshCw, Send, ShieldAlert } from "lucide-react";
+import { AlertCircle, Check, CheckCircle2, Copy, Mail, MessageCircle, RefreshCw, Send } from "lucide-react";
 
 type Status =
   | { type: "idle" }
@@ -11,7 +11,6 @@ type Status =
 
 export function InviteForm() {
   const [email, setEmail] = React.useState("");
-  const [asSuperAdmin, setAsSuperAdmin] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [status, setStatus] = React.useState<Status>({ type: "idle" });
   const [copied, setCopied] = React.useState(false);
@@ -54,11 +53,10 @@ export function InviteForm() {
     e.preventDefault();
     setStatus({ type: "idle" });
     setCopied(false);
-    const result = await send(email, asSuperAdmin ? "super_admin" : "promoter");
+    const result = await send(email, "promoter");
     if (result) {
       setStatus({ type: "success", email, link: result.link, regenerated: result.regenerated });
       setEmail("");
-      setAsSuperAdmin(false);
     }
   }
 
@@ -67,7 +65,7 @@ export function InviteForm() {
     const savedEmail = status.email;
     setStatus({ type: "idle" });
     setCopied(false);
-    const result = await send(savedEmail, asSuperAdmin ? "super_admin" : "promoter");
+    const result = await send(savedEmail, "promoter");
     if (result) setStatus({ type: "resent", email: savedEmail, link: result.link, regenerated: result.regenerated });
   }
 
@@ -105,29 +103,6 @@ export function InviteForm() {
             />
           </div>
         </label>
-
-        {/* Super admin toggle */}
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2.5 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={asSuperAdmin}
-              onChange={(ev) => setAsSuperAdmin(ev.target.checked)}
-              className="w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-accent)] cursor-pointer"
-            />
-            <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">
-              Convidar como super admin
-            </span>
-          </label>
-          {asSuperAdmin && (
-            <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-amber-500/10 border border-amber-500/25 ml-6">
-              <ShieldAlert size={14} strokeWidth={1.75} className="text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-400 leading-snug">
-                Super admins têm acesso total ao painel, incluindo convidar e deletar usuários.
-              </p>
-            </div>
-          )}
-        </div>
 
         {/* Feedback */}
         <div role="status" aria-live="polite" aria-atomic="true" className="empty:hidden">
