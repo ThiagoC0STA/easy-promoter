@@ -139,12 +139,13 @@ export function AppHeader() {
             ) : null}
             {email ? (
               <div className="flex items-center gap-3">
-                <span
-                  className="hidden sm:inline text-sm text-[var(--color-text-tertiary)] max-w-[180px] truncate"
-                  title={email}
+                <Link
+                  href="/app/perfil"
+                  className="hidden sm:inline text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] max-w-[180px] truncate transition-colors no-underline"
+                  title="Editar perfil"
                 >
                   {email}
-                </span>
+                </Link>
                 <form action="/api/auth/signout" method="post">
                   <button
                     type="submit"

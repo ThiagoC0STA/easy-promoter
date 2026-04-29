@@ -87,6 +87,8 @@ function CustomLegend({ payload }: { payload?: { value: string; color: string }[
 export function MonthlyTouchesChart({ contacts }: Props) {
   const data = buildMonthlyData(contacts);
   const hasData = data.some((d) => d.contatados > 0 || d.cadastrados > 0);
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
 
   return (
     <div className="glass-card rounded-[var(--radius-card)] p-5 sm:p-6">
@@ -103,6 +105,8 @@ export function MonthlyTouchesChart({ contacts }: Props) {
         <div className="flex items-center justify-center h-48 text-sm text-[var(--color-text-secondary)]">
           Nenhuma atividade registrada ainda.
         </div>
+      ) : !mounted ? (
+        <div className="h-56 sm:h-64 -mx-2" aria-hidden />
       ) : (
         <div className="h-56 sm:h-64 -mx-2">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>

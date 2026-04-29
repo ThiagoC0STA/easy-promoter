@@ -19,6 +19,13 @@ export function EditContactSheet() {
   const [contact, setContact] = React.useState<Contact | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [fetchError, setFetchError] = React.useState<string | null>(null);
+  const [phase, setPhase] = React.useState<"closed" | "open" | "closing">(
+    open ? "open" : "closed",
+  );
+
+  React.useEffect(() => {
+    if (open) setPhase("open");
+  }, [open]);
 
   const actionError = React.useMemo(() => {
     const raw = searchParams.get("error");
@@ -26,13 +33,24 @@ export function EditContactSheet() {
     try { return decodeURIComponent(raw); } catch { return raw; }
   }, [searchParams]);
 
-  const close = React.useCallback(() => {
+  const commitClose = React.useCallback(() => {
     const next = new URLSearchParams(searchParams.toString());
     next.delete(EDIT_PARAM);
     next.delete("error");
     const qs = next.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    setPhase("closed");
   }, [pathname, router, searchParams]);
+
+  const close = React.useCallback(() => {
+    setPhase("closing");
+  }, []);
+
+  React.useEffect(() => {
+    if (phase !== "closing") return;
+    const t = setTimeout(commitClose, 280);
+    return () => clearTimeout(t);
+  }, [phase, commitClose]);
 
   React.useEffect(() => {
     if (!editId) {
@@ -56,28 +74,29 @@ export function EditContactSheet() {
   }, [editId]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (phase !== "open") return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
-  }, [open]);
+  }, [phase]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (phase !== "open") return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") close();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, close]);
+  }, [phase, close]);
 
-  if (!open) return null;
+  if (phase === "closed") return null;
+  const isClosing = phase === "closing";
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end">
+    <div className="ps-sheet-overlay">
       <button
         type="button"
-        className="absolute inset-0 z-0 cursor-default border-0 bg-[color-mix(in_srgb,#0f172a_48%,transparent)] p-0 transition-opacity dark:bg-[color-mix(in_srgb,#000_58%,transparent)]"
+        className={`ps-sheet-backdrop${isClosing ? " closing" : ""}`}
         onClick={close}
         aria-label="Fechar painel de edição"
       />
@@ -85,36 +104,27 @@ export function EditContactSheet() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-contact-sheet-title"
-        className="ep-sheet-panel relative z-10 flex h-[100dvh] w-full max-w-2xl flex-col border-l border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-md)]"
+        className={`ps-sheet ep-sheet-panel${isClosing ? " closing" : ""}`}
       >
-        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-[var(--color-border)] px-5 py-4 sm:px-6">
-          <div className="min-w-0 pr-2">
-            <h2
-              id="edit-contact-sheet-title"
-              className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]"
-            >
+        <header className="ps-sheet-head">
+          <div className="ps-sheet-head-text">
+            <h2 id="edit-contact-sheet-title" className="ps-sheet-title">
               Editar contato
             </h2>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)] leading-snug">
-              {contact?.name ?? "Carregando…"}
-            </p>
+            <p className="ps-sheet-sub">{contact?.name ?? "Carregando…"}</p>
           </div>
           <button
             type="button"
             onClick={close}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-transparent text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+            className="ps-sheet-close"
             aria-label="Fechar"
           >
-            <X size={20} strokeWidth={1.5} aria-hidden />
+            <X size={18} strokeWidth={1.6} aria-hidden />
           </button>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6 sm:py-6">
-          {loading && (
-            <p className="text-sm text-[var(--color-text-secondary)]">Carregando…</p>
-          )}
-          {fetchError && (
-            <p className="text-sm text-[var(--color-error)]">{fetchError}</p>
-          )}
+        <div className="ps-sheet-body">
+          {loading && <SheetSkeleton />}
+          {fetchError && <div className="ps-sheet-error">{fetchError}</div>}
           {!loading && contact && (
             <ContactForm
               contact={contact}
@@ -124,6 +134,35 @@ export function EditContactSheet() {
           )}
         </div>
       </aside>
+    </div>
+  );
+}
+
+function SheetSkeleton() {
+  return (
+    <div className="ps-skeleton-wrap">
+      <div className="ps-skeleton-row">
+        <div className="ps-skeleton-label" />
+        <div className="ps-skeleton-field" />
+      </div>
+      <div className="ps-skeleton-row">
+        <div className="ps-skeleton-label" />
+        <div className="ps-skeleton-field" />
+      </div>
+      <div className="ps-skeleton-grid">
+        <div className="ps-skeleton-row">
+          <div className="ps-skeleton-label" />
+          <div className="ps-skeleton-field" />
+        </div>
+        <div className="ps-skeleton-row">
+          <div className="ps-skeleton-label" />
+          <div className="ps-skeleton-field" />
+        </div>
+      </div>
+      <div className="ps-skeleton-row">
+        <div className="ps-skeleton-label" />
+        <div className="ps-skeleton-field tall" />
+      </div>
     </div>
   );
 }

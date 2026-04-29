@@ -21,7 +21,7 @@ const FEATURES = [
   },
   {
     title: "Acesso controlado",
-    body: "Sem signup público. Só entra quem o super admin convidar por e-mail.",
+    body: "Cadastro com código de convite ou convite por e-mail enviado pelo super admin.",
     Icon: ShieldCheck,
   },
 ] as const;
@@ -118,7 +118,8 @@ export function LandingView({ user }: Props) {
               Pronto pra organizar sua lista?
             </h2>
             <p className="text-sm text-[var(--color-text-tertiary)] mb-6 max-w-md mx-auto">
-              Peça seu convite ao admin e comece a usar agora. Zero setup.
+              Peça o código de convite ou o e-mail de convite ao admin e comece
+              na hora. Zero setup.
             </p>
             <Link href="/login" className="btn-primary">
               Acessar plataforma

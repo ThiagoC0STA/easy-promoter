@@ -41,7 +41,7 @@ export default async function ContactsListPage({
   const newSheetOpen = novo === "1" || novo === "true";
 
   return (
-    <div className="mx-auto max-w-7xl px-5 sm:px-8 py-8 sm:py-10">
+    <div className="px-10 py-10">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-[28px] font-semibold tracking-tight text-[var(--color-text-primary)]">
